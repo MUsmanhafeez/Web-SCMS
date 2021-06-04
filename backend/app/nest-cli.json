@@ -1,0 +1,22 @@
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src",
+  "compilerOptions": {
+    "plugins": [
+      "@nestjs/graphql/plugin"
+    ],
+    "webpack": false
+  },
+  "projects": {
+    "graphql": {
+      "type": "library",
+      "root": "libs/graphql",
+      "entryFile": "index",
+      "sourceRoot": "libs/graphql/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/graphql/tsconfig.lib.json"
+      }
+    }
+   
+  }
+}

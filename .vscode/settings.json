@@ -1,0 +1,41 @@
+{
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": true
+	},
+	"editor.formatOnSave": true,
+	"eslint.workingDirectories": ["./backend", "./frontend"],
+	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"eslint.validate": [
+		"javascript",
+		"typescript"
+	],
+	
+	
+	"sqltools.connections": [
+		{
+			"previewLimit": 50,
+			"server": "postgresql",
+			"port": 5432,
+			"driver": "PostgreSQL",
+			"name": "amoxt-solutions-platform",
+			"username": "dev_user",
+			"password": "dev_user_password",
+			"database": "amoxt-solutions-platform",
+			"connectString": "postgres://dev_user:dev_user_password@127.0.0.1:5432/amoxt-solutions-platform"
+		},
+		{
+			"server": "localhost",
+			"port": 9042,
+			"previewLimit": 50,
+			"driver": "Cassandra",
+			"name": "amoxt-solutions-platform",
+			"database": "amoxt",
+			"password": ""
+		}
+	]
+}

@@ -1,0 +1,18 @@
+{
+  "please-wait": "Please Wait...",
+  "form-title": "User Profile",
+  "account": "Account",
+  "personal-info": "Personal Info",
+  "update-password": "Update Password",
+  "update": "Update",
+  "first-name": "Enter First Name",
+  "last-name": "Enter Last Name",
+  "old-password": "Old Password",
+  "new-password": "New Password",
+  "firstname-length-error": "First Name length must be less than 30",
+  "firstname-required": "First Name Required",
+  "lastname-length-error": "Last Name length must be less than 30",
+  "lastname-required": "Last Name Required",
+  "password-length-error": "Password must be at least 7 characters long",
+  "password-required": "Password is Required"
+}

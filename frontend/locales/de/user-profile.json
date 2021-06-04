@@ -1,0 +1,18 @@
+{
+  "please-wait": "Warten Sie mal...",
+  "form-title": "Benutzerprofil",
+  "account": "Konto",
+  "personal-info": "Persönliche Informationen",
+  "update-password": "Kennwort aktualisieren",
+  "update": "Aktualisieren",
+  "first-name": "Bitte Vornamen eingeben",
+  "last-name": "Nachnamen eingeben",
+  "old-password": "altes Kennwort",
+  "new-password": "Neues Kennwort",
+  "firstname-length-error": "Die Länge des Vornamens muss weniger als 30 betragen",
+  "firstname-required": "Vorname (erforderlich",
+  "lastname-length-error": "Die Länge des Nachnamens muss weniger als 30 betragen",
+  "lastname-required": "Nachname erforderlich",
+  "password-length-error": "Das Passwort muss mindestens 7 Zeichen lang sein",
+  "password-required": "Passwort wird benötigt"
+}

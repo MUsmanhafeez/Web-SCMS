@@ -1,0 +1,114 @@
+version: "3.3"
+
+services:
+  asp-frontend:
+    build:
+      context: frontend
+      #ADD_IN_CI dockerfile: Dockerfile.ci
+    ports: #REMOVE_IN_CI
+      - "${ASP_FRONTEND_APP_PORT}:${ASP_FRONTEND_APP_PORT}" #REMOVE_IN_CI
+    volumes: #REMOVE_IN_CI
+      - ${PWD}/frontend:/home/frontend #REMOVE_IN_CI
+    depends_on:
+      - "asp-backend"
+    command: dev
+    ipc: host # For Cypress (https://github.com/cypress-io/cypress/issues/350)
+    environment:
+      - ASP_BACKEND_APP_PORT
+      - ASP_FRONTEND_APP_PORT
+      - NEXT_PUBLIC_ASP_FRONTEND_URL=${ASP_FRONTEND_APP_URI}
+      - NEXT_PUBLIC_ASP_BACKEND_APP_URI=${ASP_BACKEND_APP_URI}
+      - NEXT_PUBLIC_OIDC_CLIENT_ID=${OIDC_CLIENT_ID}
+      - IS_CI
+      - CYPRESS_RECORD_KEY
+      - CYPRESS_BUILD_ID
+      - CYPRESS_DIRECTOR_TOKEN
+    healthcheck:
+      test:
+        ["CMD", "curl", "-f", "http://asp-frontend:${ASP_FRONTEND_APP_PORT}"]
+      interval: 1s
+      timeout: 5s
+      retries: 60
+    networks:
+      app-network:
+
+  asp-backend:
+    build:
+      context: backend/app
+      #ADD_IN_CI dockerfile: Dockerfile.ci
+    ports: #REMOVE_IN_CI
+      - "${ASP_BACKEND_APP_PORT}:${ASP_BACKEND_APP_PORT}" #REMOVE_IN_CI
+    depends_on:
+      - "asp-redis"
+      - "asp-postgres"
+      # - "asp-ms-misc"
+    command: start:dev
+    volumes: #REMOVE_IN_CI
+      - ${PWD}/backend/app:/home/backend/app #REMOVE_IN_CI
+    environment:
+      - NODE_ENV=development
+      - ASP_BACKEND_APP_PORT
+      - ASP_BACKEND_APP_URI
+      - ASP_FRONTEND_APP_URI
+      - ASP_REDIS_HOST
+      - OIDC_CLIENT_ID
+      - OIDC_CLIENT_SECRET
+      - OIDC_CLIENT_REDIRECT_URIS
+      - OIDC_PROVIDER_RESOURCES
+      - OIDC_COOKIE_SECRETS
+      - ASP_POSTGRES_HOST
+      - ASP_POSTGRES_PORT
+      - ASP_POSTGRES_USER
+      - ASP_POSTGRES_PASSWORD
+      - ASP_POSTGRES_DATABASE=${PROJECT_NAME}
+      - ASP_CASSANDRA_HOST
+      - ASP_CASSANDRA_PORT
+      - ASP_NATS_HOST
+      - ASP_NATS_PORT
+      - ASP_NATS_TOKEN
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://asp-backend:${ASP_BACKEND_APP_PORT}"]
+      interval: 1s
+      timeout: 5s
+      retries: 60
+    networks:
+      app-network:
+
+  # asp-pgadmin:
+  #   image: dpage/pgadmin4:4.27
+  #   depends_on:
+  #     - asp-postgres
+  #   ports:
+  #     - 5050:80
+  #   volumes:
+  #     - ${PWD}/backend/services/pgadmin/servers.json:/home/servers.json
+  #   environment:
+  #     - PGADMIN_DEFAULT_EMAIL
+  #     - PGADMIN_DEFAULT_PASSWORD
+  #     - PGADMIN_SERVER_JSON_FILE
+  #     - PROJECT_NAME
+  #     - ASP_POSTGRES_HOST
+  #     - ASP_POSTGRES_USER
+  # networks:
+  #   app-network:
+
+  asp-postgres:
+    image: postgres:12
+    ports:
+      - "${ASP_POSTGRES_PORT}:${ASP_POSTGRES_PORT}"
+    environment:
+      - POSTGRES_USER=${ASP_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${ASP_POSTGRES_PASSWORD}
+      - POSTGRES_DB=${PROJECT_NAME}
+    networks:
+      app-network:
+
+  asp-redis:
+    image: redis:6.2-alpine
+    networks:
+      app-network:
+
+# Custom network so all services can communicate each other
+networks:
+  app-network:
+    name: ${APP_NETWORK_NAME} #REMOVE_IN_CI

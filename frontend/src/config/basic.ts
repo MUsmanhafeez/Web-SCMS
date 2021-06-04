@@ -1,0 +1,2 @@
+export const ASP_FRONTEND_URL = process.env.NEXT_PUBLIC_ASP_FRONTEND_URL
+export const ASP_BACKEND_APP_URI = process.env.NEXT_PUBLIC_ASP_BACKEND_APP_URI

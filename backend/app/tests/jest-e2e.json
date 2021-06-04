@@ -1,0 +1,11 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "./e2e",
+  "globalSetup": "<rootDir>/../utils/globalSetup.ts",
+  "globalTeardown": "<rootDir>/../utils/globalTeardown.ts",
+  "testRegex": ".e2e-spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "silent": false
+}

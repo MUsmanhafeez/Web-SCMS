@@ -1,0 +1,104 @@
+"""
+Direct the client to resolve this field locally, either from the cache or local resolvers.
+"""
+directive @client(
+  """
+  When true, the client will never use the cache for this value. See
+  https://www.apollographql.com/docs/react/essentials/local-state/#forcing-resolvers-with-clientalways-true
+  """
+  always: Boolean
+) on FIELD | FRAGMENT_DEFINITION | INLINE_FRAGMENT
+
+"""
+Export this locally resolved field as a variable to be used in the remainder of this query. See
+https://www.apollographql.com/docs/react/essentials/local-state/#using-client-fields-as-variables
+"""
+directive @export(
+  """The variable name to export this field as."""
+  as: String!
+) on FIELD
+
+"""
+Specify a custom store key for this result. See
+https://www.apollographql.com/docs/react/advanced/caching/#the-connection-directive
+"""
+directive @connection(
+  """Specify the store key."""
+  key: String!
+
+  """
+  An array of query argument names to include in the generated custom store key.
+  """
+  filter: [String!]
+) on FIELD
+
+type AuthResponseDto {
+  returnTo: String!
+  success: Boolean!
+}
+
+type CreateAuthVerificationResDto {
+  status: Float!
+}
+
+type DeleteUserResponseDto {
+  message: String!
+  userEmail: String!
+}
+
+enum EMAIL_OUTBOX_PURPOSE {
+  ACCOUNT_REGISTRATION
+  CHANGE_EMAIL
+  OTHER
+  RESET_PASSWORD
+}
+
+type LoginResponseDto {
+  auth: AuthResponseDto!
+  user: UserDto!
+}
+
+type Mutation {
+  createAuthVerificationRequest(email: String!, purpose: EMAIL_OUTBOX_PURPOSE!): CreateAuthVerificationResDto!
+  deleteTestUser(email: String!): DeleteUserResponseDto!
+  login(email: String!, oidcInteractionUid: String!, password: String!): LoginResponseDto!
+  register(email: String!, firstName: String!, lastName: String!, oidcInteractionUid: String!, password: String!): RegisterResponseDto!
+  user(firstName: String, lastName: String, newPassword: String, oldPassword: String): UserDto!
+  verifyAuthVerificationRequest(otp: Float!, verificationId: Uuid!): VerifyAuthVerificationResDto!
+}
+
+type Query {
+  ServerStatus: ServerStatus!
+  user: UserDto!
+}
+
+type RegisterResponseDto {
+  auth: AuthResponseDto!
+  user: UserDto!
+}
+
+type ServerStatus {
+  status: String!
+}
+
+type UserDto {
+  email: String!
+  firstName: String!
+  id: Uuid!
+  lastName: String!
+  status: UserStatus!
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  TERMINATED
+  UNVERIFIED
+}
+
+"""Uuid custom scalar type from cassandra"""
+scalar Uuid
+
+type VerifyAuthVerificationResDto {
+  status: Float!
+}
