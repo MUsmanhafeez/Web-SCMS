@@ -7,7 +7,7 @@ import { useState } from 'react'
 interface IDashBoardLayoutProps {
   children?: React.ReactNode
 }
-export const DashBoardLayout: React.FC<IDashBoardLayoutProps> = (props) => {
+export const DashBoardLayout = (props) => {
   const [openMenu, setOpenMenu] = useState(false)
 
   const buttonIcon = (openMenu: boolean) => {

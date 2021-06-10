@@ -24,11 +24,11 @@ export const Avatar: FC<Props> = ({
   if (type && type !== `full`) {
     roundedClasses = type === `square` ? `` : `rounded-lg`
   }
+
   return (
-    <a href="#">
+    <a>
       <img
-        alt="profile"
-        src={img || `/images/person/1.jpg`}
+        src={img || `images/logo/logo.png`}
         className={`flex-initial mx-auto object-cover ${roundedClasses} ${sizeClasses} ${
           withBorder ? ` border-2 border-gray-300` : ``
         }`}

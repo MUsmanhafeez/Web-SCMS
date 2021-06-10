@@ -6,7 +6,7 @@ import { LoginForm } from '@components/forms/login-form'
 
 const Dashboard: FC = () => {
   return (
-    <DashBoardLayout>
+    <DashBoardLayout item="asdfsadf">
       <section className="pt-10 h-screen bg-gray-100 bg-opacity-80">
         <div className=" container max-w-2xl mx-auto shadow-md md:w-3/4">
           <UserProfileForm />

@@ -1,7 +1,7 @@
 import React, { FC } from 'react'
 import { DropDownMenu } from '@tailkit/elements/ddm/DropDownMenu'
 import Link from 'next/link'
-import { IMediaFolderCard } from 'pages/dashboard/media'
+import { IMediaFolderCard } from 'pages/dashboard/organizations'
 
 export interface IMediaFolderCardProps {
   item: IMediaFolderCard

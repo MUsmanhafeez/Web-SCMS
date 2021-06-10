@@ -10,7 +10,7 @@ import { IMediaFileCard, MEDIA_FOLDER_CARDS } from '.'
 import useTranslation from 'next-translate/useTranslation'
 import { Dropzone } from '@components/dashboard/dropzone'
 
-const MEDIA_FILE_CARDS: IMediaFileCard[] = [
+const MEDIA_FILE_CARDS = [
   {
     title: `Template 1`,
     image: `https://images.pexels.com/photos/6248036/pexels-photo-6248036.jpeg?cs=srgb&dl=pexels-alazik-maulana-koentjoro-6248036.jpg&fm=jpg`,
@@ -89,7 +89,8 @@ const Media: React.FC = () => {
   const { t } = useTranslation(`media`)
   const router = useRouter()
   const folderId = router.query
-  const folderTitle = MEDIA_FOLDER_CARDS.find((x) => x.id === folderId.id).title
+  const folderTitle = MEDIA_FOLDER_CARDS.find((x) => x.id === folderId.id)
+    ?.title
 
   return (
     <DashBoardLayout>
