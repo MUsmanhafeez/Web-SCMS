@@ -1,3 +1,4 @@
+import { OrganizationDto } from './dto/organization'
 import { Uuid } from '@lib/graphql'
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@ouato/nestjs-express-cassandra'
@@ -6,10 +7,20 @@ import { OrganizationMember } from 'src/entities/postgres/OrganizationMembers'
 import { OrganizationType } from 'src/entities/postgres/OrganizationMembers/types'
 import { User } from 'src/entities/postgres/User'
 import { Repository } from 'typeorm'
-import { OrganizationDto, OrganizationMemberDto } from './dto'
+import { AddOrganizationReqDto, OrganizationMemberDto } from './dto'
 
 @Injectable()
 export class OrganizationService {
+  //     relations: listMembers && [`users`]
+  //   })
+  // }
+  getOrganization(
+    orgId: Uuid,
+    listMembers: boolean
+  ): OrganizationDto | PromiseLike<OrganizationDto> {
+    throw new Error(`Method not implemented.`)
+  }
+
   constructor(
     @InjectRepository(Organization)
     private orgRepo: Repository<Organization>,
@@ -17,16 +28,33 @@ export class OrganizationService {
     private orgMemberRepo: Repository<OrganizationMember>
   ) {}
 
-  // This method return the org
-  async getOrganization(
-    orgId: Uuid,
-    listMembers?: boolean
+  async addOrganization(
+    addOrganizationReqDto,
+    orgparam: AddOrganizationReqDto
   ): Promise<OrganizationDto> {
-    return await this.orgRepo.findOne({
-      where: { id: orgId },
-      relations: listMembers && [`users`]
-    })
+    const { name, iName, desc, phone, location } = orgparam
+    if (
+      addOrganizationReqDto.name === name &&
+      addOrganizationReqDto.iName === iName &&
+      addOrganizationReqDto.desc === desc &&
+      addOrganizationReqDto.phone === phone &&
+      addOrganizationReqDto.location === location
+    )
+      throw new Error(`Method not implemented.`)
+    const AddOrganizationReqDto = await this.orgRepo.save(addOrganizationReqDto)
+    return new OrganizationDto(addOrganizationReqDto)
   }
+
+  // This method return the org
+  // async getOrganization(
+  //   orgId: Uuid,
+  //   listMembers?: boolean
+  // ): Promise<OrganizationDto> {
+  //   return await this.orgRepo.findOne({
+  //     where: { id: orgId },
+  //     relations: listMembers && [`users`]
+  //   })
+  // }
 
   async saveOrganization(organization: Organization) {
     return await this.orgRepo.save(organization)

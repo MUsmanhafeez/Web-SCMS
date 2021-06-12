@@ -11,6 +11,10 @@ import {
 import { User } from '../User'
 interface IOrganizationParams {
   name: string
+  iName?: string
+  desc: string
+  phone: number
+  location: string
 }
 
 @Entity({ name: `organization`, schema: `organization` })
@@ -18,6 +22,10 @@ export class Organization {
   constructor(params: IOrganizationParams) {
     if (params) {
       this.name = params.name
+      this.iName = params.iName
+      this.phone = params.phone
+      this.desc = params.desc
+      this.location = params.location
     }
   }
 
@@ -30,10 +38,24 @@ export class Organization {
   readonly id: Uuid = new Uuid()
 
   @Index()
-  @Column({
-    length: 100
-  })
+  @Column()
   name: string
+
+  @Index()
+  @Column()
+  iName?: string
+
+  @Index()
+  @Column()
+  desc: string
+
+  @Index()
+  @Column()
+  phone: number
+
+  @Index()
+  @Column({})
+  location: string
 
   @Column()
   @CreateDateColumn()

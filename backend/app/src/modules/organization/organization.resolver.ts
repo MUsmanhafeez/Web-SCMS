@@ -1,12 +1,13 @@
 import { Uuid } from '@lib/graphql'
-import { UseGuards } from '@nestjs/common'
-import { Args, Query, Resolver } from '@nestjs/graphql'
+import { Inject, UseGuards } from '@nestjs/common'
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { OrganizationMember } from 'src/entities/postgres/OrganizationMembers'
 import { GraphqlAuthGuard } from 'src/gaurds/jwt-auth.guards'
 import { userDecoder } from 'src/middleware/user-decoder'
 
 import { UserService } from '../user/user.service'
 import {
+  AddOrganizationReqDto,
   OrganizationDto,
   OrganizationListDto,
   OrganizationListRequestDto,
@@ -18,36 +19,29 @@ import { OrganizationService } from './organization.service'
 @Resolver(() => OrganizationMember)
 export class OrganizationResolver {
   constructor(
+    @Inject(OrganizationService)
     private readonly orgService: OrganizationService,
     private readonly userService: UserService
   ) {}
 
-  @Query(returns => OrganizationListDto, { name: `organizationList` })
+  @Mutation(() => OrganizationDto, { name: `addOrganization` })
   @UseGuards(GraphqlAuthGuard)
-  async getOrganizationList(
-    @Args() { listMembers }: OrganizationListRequestDto,
-    @userDecoder(`id`) userId: Uuid
-  ): Promise<OrganizationListDto> {
-    const userWithOrg = await this.userService.getUser({ id: userId }, true)
-    const user = listMembers
-      ? {
-          id: userWithOrg.id,
-          email: userWithOrg.email,
-          firstName: userWithOrg.firstName,
-          lastName: userWithOrg.lastName,
-          status: userWithOrg.status
-        }
-      : null
-    return new OrganizationListDto({
-      organizations: userWithOrg.organizations,
-      user
-    })
+  async addOrganization(
+    @Args(`addOrganizationReqDto`) addOrganizationReqDto: AddOrganizationReqDto,
+
+    OrganizationDto: OrganizationMember
+  ): Promise<OrganizationDto> {
+    return await this.orgService.addOrganization(
+      this.addOrganization,
+      addOrganizationReqDto
+    )
   }
 
   @Query(returns => OrganizationDto, { name: `organization` })
   @UseGuards(GraphqlAuthGuard)
   async getOrganization(
-    @Args() { listMembers, orgId }: OrganizationRequestDto,
+    @Args()
+    { listMembers, orgId }: OrganizationRequestDto,
     @userDecoder(`id`) userId: Uuid
   ): Promise<OrganizationDto> {
     await this.orgService.checkRelationShipExist(orgId, userId)

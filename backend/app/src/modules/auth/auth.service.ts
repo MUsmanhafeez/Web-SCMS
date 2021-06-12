@@ -30,7 +30,6 @@ import { UserService } from '../user/user.service'
 import { UserDto } from '../user/dtos'
 import { Uuid } from '@lib/graphql'
 import { OrganizationService } from '../organization/organization.service'
-import { Organization } from 'src/entities/postgres/organization'
 
 @Injectable()
 export class AuthService {
@@ -71,9 +70,9 @@ export class AuthService {
         `User with this email already exits!`,
         HttpStatus.CONFLICT
       )
-    const _org = new Organization({
-      name: `${firstName} ${lastName}`
-    })
+    // const _org = new Organization({
+    //   name: `${firstName} ${lastName}`
+    // })
 
     const user: User = new User({
       email,
@@ -81,12 +80,11 @@ export class AuthService {
       lastName
     })
 
-    await this.orgService.saveOrganization(_org)
+    // await this.orgService.saveOrganization(_org)
 
-    user.setOrganization(_org)
+    // user.setOrganization(_org)
     await user.setPassword(password)
     const newUser = await this.userService.saveUser(user)
-
 
     const oidcInteractionResult: OidcInteractionResult = {
       login: {

@@ -1,6 +1,7 @@
 import { Uuid } from '@lib/graphql'
-import { ObjectType, Field, ArgsType } from '@nestjs/graphql'
+import { ObjectType, Field, ArgsType, InputType } from '@nestjs/graphql'
 import { IsOptional } from 'class-validator'
+import { isNullableType } from 'graphql'
 import { Organization } from 'src/entities/postgres/organization'
 import { User } from 'src/entities/postgres/User'
 import { UserDto } from 'src/modules/user/dtos'
@@ -14,6 +15,10 @@ export class OrganizationDto {
     if (org) {
       this.id = org.id
       this.name = org.name
+      this.iName = org.iName
+      this.desc = org.desc
+      this.phone = org.phone
+      this.location = org.location
       this.createdAt = org.createdAt
       this.updatedAt = org.updatedAt
       this.users = org.users
@@ -25,6 +30,18 @@ export class OrganizationDto {
 
   @Field()
   name: string
+
+  @Field()
+  iName: string
+
+  @Field()
+  desc: string
+
+  @Field()
+  phone: number
+
+  @Field()
+  location: string
 
   @Field()
   readonly createdAt: Date
@@ -68,4 +85,22 @@ export class OrganizationRequestDto {
 
   @Field()
   orgId?: Uuid
+}
+
+@InputType()
+export class AddOrganizationReqDto {
+  @Field()
+  name: string
+
+  @Field({ nullable: true })
+  iName: string
+
+  @Field({ nullable: true })
+  desc: string
+
+  @Field()
+  phone: number
+
+  @Field()
+  location: string
 }
