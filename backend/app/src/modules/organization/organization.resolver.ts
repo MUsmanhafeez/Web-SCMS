@@ -25,16 +25,11 @@ export class OrganizationResolver {
   ) {}
 
   @Mutation(() => OrganizationDto, { name: `addOrganization` })
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard) // TODO
   async addOrganization(
-    @Args(`addOrganizationReqDto`) addOrganizationReqDto: AddOrganizationReqDto,
-
-    OrganizationDto: OrganizationMember
+    @Args(`addOrganizationReqDto`) addOrganizationReqDto: AddOrganizationReqDto
   ): Promise<OrganizationDto> {
-    return await this.orgService.addOrganization(
-      this.addOrganization,
-      addOrganizationReqDto
-    )
+    return await this.orgService.addOrganization(addOrganizationReqDto)
   }
 
   @Query(returns => OrganizationDto, { name: `organization` })

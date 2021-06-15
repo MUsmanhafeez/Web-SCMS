@@ -29,20 +29,18 @@ export class OrganizationService {
   ) {}
 
   async addOrganization(
-    addOrganizationReqDto,
-    orgparam: AddOrganizationReqDto
+    orgParam: AddOrganizationReqDto
   ): Promise<OrganizationDto> {
-    const { name, iName, desc, phone, location } = orgparam
-    if (
-      addOrganizationReqDto.name === name &&
-      addOrganizationReqDto.iName === iName &&
-      addOrganizationReqDto.desc === desc &&
-      addOrganizationReqDto.phone === phone &&
-      addOrganizationReqDto.location === location
-    )
-      throw new Error(`Method not implemented.`)
-    const AddOrganizationReqDto = await this.orgRepo.save(addOrganizationReqDto)
-    return new OrganizationDto(addOrganizationReqDto)
+    const _org: Organization = new Organization({
+      name: orgParam.name,
+      iName: orgParam.iName,
+      phone: orgParam.phone,
+      desc: orgParam.desc,
+      location: orgParam.location
+    })
+    const savedOrganization = await this.orgRepo.save(_org)
+
+    return new OrganizationDto(savedOrganization.getOrganization())
   }
 
   // This method return the org
@@ -55,10 +53,6 @@ export class OrganizationService {
   //     relations: listMembers && [`users`]
   //   })
   // }
-
-  async saveOrganization(organization: Organization) {
-    return await this.orgRepo.save(organization)
-  }
 
   // This Method will return all ids of members of Organization
   async getOrgMembers(orgId: Uuid): Promise<User[]> {

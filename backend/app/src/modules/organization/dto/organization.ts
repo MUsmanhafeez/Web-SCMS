@@ -1,8 +1,10 @@
 import { Uuid } from '@lib/graphql'
 import { ObjectType, Field, ArgsType, InputType } from '@nestjs/graphql'
 import { IsOptional } from 'class-validator'
-import { isNullableType } from 'graphql'
-import { Organization } from 'src/entities/postgres/organization'
+import {
+  IOrganizationParams,
+  Organization
+} from 'src/entities/postgres/organization'
 import { User } from 'src/entities/postgres/User'
 import { UserDto } from 'src/modules/user/dtos'
 interface IOrganizationListDtoParams {
@@ -11,7 +13,7 @@ interface IOrganizationListDtoParams {
 }
 @ObjectType()
 export class OrganizationDto {
-  constructor(org: Organization) {
+  constructor(org: IOrganizationParams) {
     if (org) {
       this.id = org.id
       this.name = org.name

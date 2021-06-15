@@ -2,11 +2,10 @@ import { Inject, UseGuards, UsePipes } from '@nestjs/common'
 import { Resolver, Mutation, Args, Query } from '@nestjs/graphql'
 
 import { User } from '../../entities/postgres/User'
-import { UpdateRequestDto } from './dtos/user'
 import { UserService } from './user.service'
 import { userDecoder } from '../../middleware/user-decoder'
 import { GraphqlAuthGuard } from '../../gaurds/jwt-auth.guards'
-import { UserDto } from './dtos'
+import { UpdateRequestDto, UserDto } from './dtos'
 
 @Resolver(() => User)
 export class UserResolver {

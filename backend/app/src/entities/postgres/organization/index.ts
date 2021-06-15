@@ -9,12 +9,16 @@ import {
   ManyToMany
 } from 'typeorm'
 import { User } from '../User'
-interface IOrganizationParams {
+export interface IOrganizationParams {
+  id?: Uuid
   name: string
   iName?: string
   desc: string
   phone: number
   location: string
+  users?: User[]
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 @Entity({ name: `organization`, schema: `organization` })
@@ -59,15 +63,27 @@ export class Organization {
 
   @Column()
   @CreateDateColumn()
-  readonly createdAt: Date
+  readonly createdAt?: Date
 
   @Column()
   @UpdateDateColumn()
-  readonly updatedAt: Date
+  readonly updatedAt?: Date
 
   @ManyToMany(
     type => User,
     user => user.organizations
   )
   users: User[]
+
+  getOrganization(): IOrganizationParams {
+    return {
+      id: this.id,
+      name: this.name,
+      iName: this.iName,
+      phone: this.phone,
+      desc: this.desc,
+      location: this.location,
+      users: this.users
+    }
+  }
 }

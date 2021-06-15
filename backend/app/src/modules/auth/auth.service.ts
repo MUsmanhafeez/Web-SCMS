@@ -27,9 +27,9 @@ import { epochTime } from 'src/utils/time'
 
 // External Services
 import { UserService } from '../user/user.service'
-import { UserDto } from '../user/dtos'
 import { Uuid } from '@lib/graphql'
 import { OrganizationService } from '../organization/organization.service'
+import { UserDto } from '../user/dtos'
 
 @Injectable()
 export class AuthService {
