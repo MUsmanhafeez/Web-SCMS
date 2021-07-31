@@ -1,5 +1,5 @@
 import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator'
-import { Field, ArgsType, ObjectType } from '@nestjs/graphql'
+import { Field, ArgsType, ObjectType, InputType } from '@nestjs/graphql'
 import { UserStatus } from 'src/entities/postgres/User/types'
 import { User } from 'src/entities/postgres/User'
 import { Uuid } from '@lib/graphql'

@@ -1,4 +1,8 @@
-import { OrganizationDto } from './dto/organization'
+import {
+  AddTotalRequestDto,
+  ModifyOrganizationReqDto,
+  OrganizationDto
+} from './dto/organization'
 import { Uuid } from '@lib/graphql'
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@ouato/nestjs-express-cassandra'
@@ -6,20 +10,42 @@ import { Organization } from 'src/entities/postgres/organization'
 import { OrganizationMember } from 'src/entities/postgres/OrganizationMembers'
 import { OrganizationType } from 'src/entities/postgres/OrganizationMembers/types'
 import { User } from 'src/entities/postgres/User'
-import { Repository } from 'typeorm'
+import { Repository, getConnection } from 'typeorm'
 import { AddOrganizationReqDto, OrganizationMemberDto } from './dto'
-
 @Injectable()
 export class OrganizationService {
+  async modifyOrganization(
+    orgReqDto: ModifyOrganizationReqDto,
+    user: User
+  ): Promise<OrganizationDto> {
+    const org = await this.orgRepo.findOne({
+      where: { id: orgReqDto.orgId },
+      relations: [`users`]
+    })
+    console.log(`previosOrg`, org)
+    if (org.ownerId !== user.id.uuid)
+      throw new HttpException(
+        `You are Not an owner of that organization!`,
+        HttpStatus.CONFLICT
+      )
+
+    const newOrg = new Organization({
+      id: org.id,
+      ownerId: org.ownerId,
+      location: org.location,
+      users: org.users,
+      ...orgReqDto
+    })
+    console.log(`newOrg`, newOrg)
+
+    await this.orgRepo.delete({ id: org.id })
+
+    await this.orgRepo.save(newOrg)
+    return new OrganizationDto(newOrg)
+  }
   //     relations: listMembers && [`users`]
   //   })
   // }
-  getOrganization(
-    orgId: Uuid,
-    listMembers: boolean
-  ): OrganizationDto | PromiseLike<OrganizationDto> {
-    throw new Error(`Method not implemented.`)
-  }
 
   constructor(
     @InjectRepository(Organization)
@@ -28,18 +54,78 @@ export class OrganizationService {
     private orgMemberRepo: Repository<OrganizationMember>
   ) {}
 
+  async getAllOrganization(userId: Uuid): Promise<OrganizationDto[]> {
+    const data = await this.orgRepo.find({
+      relations: [`users`]
+    })
+    return data.map(res => new OrganizationDto(res))
+  }
+
+  getOrganization(
+    orgId: Uuid,
+    listMembers: boolean
+  ): OrganizationDto | PromiseLike<OrganizationDto> {
+    throw new Error(`Method not implemented.`)
+  }
+
+  async deleteOrganization(orgId: Uuid, userId: Uuid): Promise<boolean> {
+    try {
+      const organization = await this.orgRepo.findOne({ id: orgId })
+      if (organization.ownerId !== userId.uuid)
+        throw new HttpException(
+          `You are Not an owner of that organization!`,
+          HttpStatus.CONFLICT
+        )
+      await this.orgRepo.delete({ id: orgId })
+      return true
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.CONFLICT)
+    }
+  }
+
+  async addTotalAmount(
+    addTotalRequestDto: AddTotalRequestDto,
+    user: User
+  ) /* Promise<OrganizationDto>  */ {
+    const org = await this.orgRepo.findOne({
+      where: { id: addTotalRequestDto.orgId },
+      relations: [`users`]
+    })
+    await this.orgRepo.delete({ id: org.id })
+    const findUser = org.users.find(item => item.id.uuid === user.id.uuid)
+    // if (!findUser) {
+    //   console.log(`in user`)
+    //   console.log(`org.id ${org.id.uuid}`)
+    //   console.log(`user.id ${user.id.uuid}`)
+    //   const member = new OrganizationMember({
+    //     orgId: org.id,
+    //     userId: user.id
+    //   })
+
+    //   await this.orgMemberRepo.save(member)
+    // }
+    !findUser && org.users.push(user)
+    org.totalAmount += addTotalRequestDto.totalAmount
+    await this.orgRepo.save(org)
+    return new OrganizationDto(org)
+  }
+
   async addOrganization(
-    orgParam: AddOrganizationReqDto
+    orgParam: AddOrganizationReqDto,
+    user: User
   ): Promise<OrganizationDto> {
     const _org: Organization = new Organization({
       name: orgParam.name,
       iName: orgParam.iName,
       phone: orgParam.phone,
       desc: orgParam.desc,
-      location: orgParam.location
+      location: orgParam.location,
+      type: orgParam.type,
+      ownerId: user.id.uuid,
+      totalAmount: orgParam.totalAmount,
+      users: [user]
     })
     const savedOrganization = await this.orgRepo.save(_org)
-
     return new OrganizationDto(savedOrganization.getOrganization())
   }
 

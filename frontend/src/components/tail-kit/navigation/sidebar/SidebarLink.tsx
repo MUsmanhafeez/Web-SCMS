@@ -17,7 +17,7 @@ export const SidebarLink: FC<SidebarLinkProps> = (props) => {
         <span className="text-left">
           <i className={props.icon}></i>
         </span>
-        <span className="mx-6 text-sm font-normal capitalize">
+        <span className="mx-6 text-xs font-normal capitalize">
           {props.title}
         </span>
       </a>

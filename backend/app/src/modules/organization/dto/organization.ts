@@ -1,10 +1,20 @@
 import { Uuid } from '@lib/graphql'
-import { ObjectType, Field, ArgsType, InputType } from '@nestjs/graphql'
-import { IsOptional } from 'class-validator'
+import {
+  ObjectType,
+  Field,
+  ArgsType,
+  InputType,
+  registerEnumType
+} from '@nestjs/graphql'
+import { IsEnum, IsOptional } from 'class-validator'
 import {
   IOrganizationParams,
   Organization
 } from 'src/entities/postgres/organization'
+import {
+  OrganizationPostType,
+  OrganizationType
+} from 'src/entities/postgres/OrganizationMembers/types'
 import { User } from 'src/entities/postgres/User'
 import { UserDto } from 'src/modules/user/dtos'
 interface IOrganizationListDtoParams {
@@ -24,6 +34,9 @@ export class OrganizationDto {
       this.createdAt = org.createdAt
       this.updatedAt = org.updatedAt
       this.users = org.users
+      this.type = org.type
+      this.ownerId = org.ownerId
+      this.totalAmount = org.totalAmount
     }
   }
 
@@ -33,23 +46,35 @@ export class OrganizationDto {
   @Field()
   name: string
 
-  @Field()
-  iName: string
+  @Field({ nullable: true })
+  @IsOptional()
+  iName?: string
+
+  @Field({ nullable: true })
+  @IsOptional()
+  totalAmount?: number
 
   @Field()
   desc: string
 
   @Field()
-  phone: number
+  phone: string
 
   @Field()
   location: string
 
   @Field()
-  readonly createdAt: Date
+  ownerId: string
+
+  @Field(type => OrganizationPostType)
+  type: OrganizationPostType
 
   @Field()
-  readonly updatedAt: Date
+  readonly createdAt: Date
+
+  @Field({ nullable: true })
+  @IsOptional()
+  readonly updatedAt?: Date
 
   @Field(type => [UserDto], { nullable: `itemsAndList` })
   @IsOptional()
@@ -88,6 +113,14 @@ export class OrganizationRequestDto {
   @Field()
   orgId?: Uuid
 }
+@ArgsType()
+export class AddTotalRequestDto {
+  @Field()
+  totalAmount?: number
+
+  @Field()
+  orgId?: Uuid
+}
 
 @InputType()
 export class AddOrganizationReqDto {
@@ -95,14 +128,51 @@ export class AddOrganizationReqDto {
   name: string
 
   @Field({ nullable: true })
-  iName: string
+  @IsOptional()
+  iName?: string
 
   @Field({ nullable: true })
   desc: string
 
   @Field()
-  phone: number
+  phone: string
 
   @Field()
   location: string
+
+  @Field({ nullable: true })
+  totalAmount: number
+
+  @Field(() => OrganizationPostType)
+  @IsEnum(OrganizationPostType)
+  type: OrganizationPostType
 }
+
+@InputType()
+export class ModifyOrganizationReqDto {
+  @Field()
+  orgId: Uuid
+
+  @Field()
+  name: string
+
+  @Field({ nullable: true })
+  @IsOptional()
+  iName?: string
+
+  @Field({ nullable: true })
+  desc: string
+
+  @Field()
+  phone: string
+
+  @Field({ nullable: true })
+  totalAmount: number
+
+  @Field(() => OrganizationPostType)
+  @IsEnum(OrganizationPostType)
+  type: OrganizationPostType
+}
+registerEnumType(OrganizationPostType, {
+  name: `OrganizationPostType`
+})

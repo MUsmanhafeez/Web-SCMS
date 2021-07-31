@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.3.7",
+    "@material-ui/icons": "^4.11.2",
     "@reduxjs/toolkit": "^1.5.1",
     "deepmerge": "^4.2.2",
     "formik": "^2.2.6",

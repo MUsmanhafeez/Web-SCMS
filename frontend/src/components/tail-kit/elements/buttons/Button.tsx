@@ -10,7 +10,7 @@ interface Props {
   className?: string
   isloading?: boolean
   loadingText?: string
-  onClick?: () => void
+  onClick?: (e?: any) => void
   children?: React.ReactNode
 }
 enum colors {

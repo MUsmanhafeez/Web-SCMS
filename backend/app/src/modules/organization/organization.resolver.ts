@@ -1,3 +1,5 @@
+import { ModifyOrganizationReqDto } from './dto/organization'
+import { User } from 'src/entities/postgres/User'
 import { Uuid } from '@lib/graphql'
 import { Inject, UseGuards } from '@nestjs/common'
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
@@ -11,7 +13,8 @@ import {
   OrganizationDto,
   OrganizationListDto,
   OrganizationListRequestDto,
-  OrganizationRequestDto
+  OrganizationRequestDto,
+  AddTotalRequestDto
 } from './dto'
 
 import { OrganizationService } from './organization.service'
@@ -25,11 +28,35 @@ export class OrganizationResolver {
   ) {}
 
   @Mutation(() => OrganizationDto, { name: `addOrganization` })
-  // @UseGuards(GraphqlAuthGuard) // TODO
+  @UseGuards(GraphqlAuthGuard)
   async addOrganization(
-    @Args(`addOrganizationReqDto`) addOrganizationReqDto: AddOrganizationReqDto
+    @Args(`addOrganizationReqDto`) addOrganizationReqDto: AddOrganizationReqDto,
+    @userDecoder() user: User
   ): Promise<OrganizationDto> {
-    return await this.orgService.addOrganization(addOrganizationReqDto)
+    return await this.orgService.addOrganization(addOrganizationReqDto, user)
+  }
+
+  @Mutation(() => OrganizationDto, { name: `modifyOrganization` })
+  @UseGuards(GraphqlAuthGuard)
+  async modifyOrganization(
+    @Args(`modifyOrgReqDto`) orgReqDto: ModifyOrganizationReqDto,
+    @userDecoder() user: User
+  ): Promise<OrganizationDto> {
+    await this.orgService.checkRelationShipExist(orgReqDto.orgId, user.id)
+    return await this.orgService.modifyOrganization(orgReqDto, user)
+  }
+
+  @Mutation(() => OrganizationDto, { name: `addTotalAmount` })
+  @UseGuards(GraphqlAuthGuard)
+  async addTotalAmount(
+    @Args() addTotalRequestDto: AddTotalRequestDto,
+    @userDecoder() user: User
+  ): Promise<OrganizationDto> {
+    await this.orgService.checkRelationShipExist(
+      addTotalRequestDto.orgId,
+      user.id
+    )
+    return await this.orgService.addTotalAmount(addTotalRequestDto, user)
   }
 
   @Query(returns => OrganizationDto, { name: `organization` })
@@ -41,5 +68,23 @@ export class OrganizationResolver {
   ): Promise<OrganizationDto> {
     await this.orgService.checkRelationShipExist(orgId, userId)
     return await this.orgService.getOrganization(orgId, listMembers)
+  }
+
+  @Query(returns => Boolean, { name: `deleteOrganization` })
+  @UseGuards(GraphqlAuthGuard)
+  async deleteOrganization(
+    @Args(`orgId`) orgId: Uuid,
+    @userDecoder(`id`) userId: Uuid
+  ): Promise<boolean> {
+    await this.orgService.checkRelationShipExist(orgId, userId)
+    return await this.orgService.deleteOrganization(orgId, userId)
+  }
+
+  @Query(returns => [OrganizationDto], { name: `allOrganization` })
+  @UseGuards(GraphqlAuthGuard)
+  async getAllOrganization(
+    @userDecoder(`id`) userId: Uuid
+  ): Promise<OrganizationDto[]> {
+    return await this.orgService.getAllOrganization(userId)
   }
 }

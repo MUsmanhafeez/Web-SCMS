@@ -6,6 +6,11 @@ export const LEFT_SIDEBAR_LINKS: ILeftsideBarLinks[] = [
     icon: `fas fa-play fa-lg`,
     route: `/dashboard/organizations`,
   },
+  {
+    name: `My Organization`,
+    icon: `fas fa-play fa-lg`,
+    route: `/dashboard/organizations/myOrganizations`,
+  },
 ]
 
 export const AUTH_ROUTES = [`/dashboard`]

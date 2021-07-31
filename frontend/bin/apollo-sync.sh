@@ -10,7 +10,7 @@ apollo_tools_config_default_dir="src/config/apollo/tools-configs"
 apollo_tools_schema_output_dir=${APOLLO_TOOLS_SCHEMA_OUTPUT_DIR:-$apollo_tools_schema_output_default_dir}
 apollo_tools_config_dir=${APOLLO_TOOLS_CONFIG_DIR:-$apollo_tools_config_default_dir}
 
-apollo_gql_types_file="$apollo_tools_schema_output_default_dir/index.d.ts"
+apollo_gql_types_file="$apollo_tools_schema_output_default_dir/index.ts"
 
 # Delete the graphql type file
 # rm -f $apollo_gql_types_file # Turned off because conflicts may occur (TODO)
@@ -20,14 +20,14 @@ addGqlTypes()
   service_name="$1"
   service_dir="$2"
   schema_generated_dir=$service_dir/$apollo_tools_types_dir_name
-  service_gql_type_file="$service_dir/index.d.ts"
+  service_gql_type_file="$service_dir/index.ts"
 
   # Removing service gql file
   rm -f $service_gql_type_file
 
   for gql_type_file in "$schema_generated_dir"/*
   do
-    gql_type_file_name="$(basename "$gql_type_file" ".d.ts")"
+    gql_type_file_name="$(basename "$gql_type_file" ".ts")"
     echo "export * from './$apollo_tools_types_dir_name/$gql_type_file_name'" >> $service_gql_type_file
   done
 
@@ -56,7 +56,7 @@ do
   npx apollo client:download-schema -c $config_file $schema_graphql_dir
 
   # Generating types
-  npx apollo client:codegen -c $config_file $schema_generated_dir --namespace $service_export_name --target typescript --addTypename --outputFlat --tsFileExtension=d.ts --passthroughCustomScalars
+  npx apollo client:codegen -c $config_file $schema_generated_dir --namespace $service_export_name --target typescript --addTypename --outputFlat --tsFileExtension=ts --passthroughCustomScalars
   
   addGqlTypes $service_name $service_dir
 done

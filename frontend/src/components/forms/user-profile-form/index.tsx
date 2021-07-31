@@ -84,7 +84,7 @@ export const UserProfileForm: FC = () => {
     return <div>Not ready</div>
   } else {
     return (
-      <FormLayout imgSrc="images/logo/logo.png" title={t(`form-title`)}>
+      <FormLayout imgSrc="images/logo/SCMS.jpeg" title={t(`form-title`)}>
         <form onSubmit={formik.handleSubmit}>
           <div className="items-center w-full  p-2 space-y-2 text-gray-500 md:inline-flex md:space-y-0">
             <h2 className="max-w-sm mx-auto md:w-1/3">{t(`account`)}</h2>

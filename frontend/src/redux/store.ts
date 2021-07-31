@@ -12,7 +12,7 @@ const initialState = {}
 const persistConfig = {
   key: `PresistStorage`, // variable name in storage
   storage,
-  whitelist: [`user`], // which reducer want to store
+  whitelist: [`user`, `organization`], // which reducer want to store
 }
 // inialize the reducer
 const persistReducerState = persistReducer(persistConfig, rootReducer)

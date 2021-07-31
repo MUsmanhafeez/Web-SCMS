@@ -1,4 +1,5 @@
 import { Uuid } from '@lib/graphql'
+import { IsOptional } from 'class-validator'
 import {
   Entity,
   Column,
@@ -8,15 +9,19 @@ import {
   PrimaryColumn,
   ManyToMany
 } from 'typeorm'
+import { OrganizationPostType } from '../OrganizationMembers/types'
 import { User } from '../User'
 export interface IOrganizationParams {
   id?: Uuid
   name: string
   iName?: string
   desc: string
-  phone: number
-  location: string
+  phone: string
+  location?: string
+  type: OrganizationPostType
   users?: User[]
+  totalAmount?: number
+  ownerId?: string
   createdAt?: Date
   updatedAt?: Date
 }
@@ -30,6 +35,10 @@ export class Organization {
       this.phone = params.phone
       this.desc = params.desc
       this.location = params.location
+      this.type = params.type
+      this.users = params.users
+      this.ownerId = params.ownerId
+      this.totalAmount = params.totalAmount
     }
   }
 
@@ -47,6 +56,7 @@ export class Organization {
 
   @Index()
   @Column()
+  @IsOptional()
   iName?: string
 
   @Index()
@@ -55,11 +65,26 @@ export class Organization {
 
   @Index()
   @Column()
-  phone: number
+  phone: string
 
   @Index()
-  @Column({})
+  @Column()
   location: string
+
+  @Index()
+  @Column({ nullable: true })
+  totalAmount: number
+
+  @Index()
+  @Column()
+  ownerId: string
+
+  @Column({
+    type: `enum`,
+    enum: OrganizationPostType,
+    default: OrganizationPostType.OTHER
+  })
+  type: OrganizationPostType
 
   @Column()
   @CreateDateColumn()
@@ -83,7 +108,11 @@ export class Organization {
       phone: this.phone,
       desc: this.desc,
       location: this.location,
-      users: this.users
+      users: this.users,
+      type: this.type,
+      createdAt: this.createdAt,
+      totalAmount: this.totalAmount,
+      ownerId: this.ownerId
     }
   }
 }

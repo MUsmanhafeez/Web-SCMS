@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { DashBoardLayout } from '@components/dashboard/layout'
 import { Header } from '@components/layout/Header'
 import { Button } from '@components/tail-kit/elements/buttons/Button'
@@ -11,14 +11,22 @@ import { MediaFolderCard } from '@components/dashboard/media/MediaFolderCard'
 import useTranslation from 'next-translate/useTranslation'
 import { Dropzone } from '@components/dashboard/dropzone'
 import Link from 'next/link'
+import {
+  allOrganization,
+  allOrganization_allOrganization,
+  GqlMAddOrganization_addOrganization,
+} from '@gqlTypes/asp'
+import { useQuery } from '@apollo/client'
+import { GQL_All_ORGANIZATION } from '@entities/asp/organization'
 // import { InputText } from '@components/tail-kit/form/input-text/InputText'
-
+import { useDispatch } from 'react-redux'
+import { setOrganization } from '@redux/actions'
 export interface IMediaFolderCard {
-  id: string
-  // icon: string
-  title: string
+  name: string
   desc: string
+  createdAt: string
   phone: string
+  type: string
 }
 export interface IMediaFileCard {
   title: string
@@ -28,98 +36,10 @@ export interface IMediaFileCard {
   user: ITemplateUser
 }
 
-export const MEDIA_FOLDER_CARDS: IMediaFolderCard[] = [
-  {
-    id: `1`,
-    title: `Template 1`,
-    // icon: `fas fa-folder fa-lg mr-3 text-primary`,
-    desc: `abc`,
-    phone: `123456`,
-  },
-  // {
-  //   id: `2`,
-  //   title: `Template 2`,
-  //   icon: `fas fa-folder fa-lg mr-3 text-primary`,
-  // },
-  // {
-  //   id: `3`,
-  //   title: `Template 3`,
-  //   icon: `fas fa-folder fa-lg mr-3 text-primary`,
-  // },
-  // {
-  //   id: `4`,
-  //   title: `Template 4`,
-  //   icon: `fas fa-folder fa-lg mr-3 text-primary`,
-  // },
-  // {
-  //   id: `2`,
-  //   title: `Template 2`,
-  //   icon: `fas fa-folder fa-lg mr-3 text-primary`,
-  // },
-  // {
-  //   id: `3`,
-  //   title: `Template 3`,
-  //   icon: `fas fa-folder fa-lg mr-3 text-primary`,
-  // },
-  // {
-  //   id: `4`,
-  //   title: `Template 4`,
-  //   icon: `fas fa-folder fa-lg mr-3 text-primary`,
-  // },
-]
-
-const MEDIA_FILE_CARDS: IMediaFileCard[] = [
-  {
-    title: `Template 1`,
-    image: `https://images.pexels.com/photos/6437836/pexels-photo-6437836.jpeg?cs=srgb&dl=pexels-marta-wave-6437836.jpg&fm=jpg`,
-    tag: `image`,
-    lastUsed: `6 hours ago`,
-    user: {
-      image: `https://previews.123rf.com/images/pandavector/pandavector1901/pandavector190105241/126078927-vector-illustration-of-avatar-and-dummy-icon-collection-of-avatar-and-image-vector-icon-for-stock-.jpg`,
-      name: `Adeel`,
-      lastUpdatedTime: `6 mins ago`,
-      desc: `aqws`,
-      phone: `123456789`,
-    },
-  },
-  // {
-  //   title: `Template 2`,
-  //   image: `https://images.pexels.com/photos/3663037/pexels-photo-3663037.jpeg?cs=srgb&dl=pexels-katie-e-3663037.jpg&fm=jpg`,
-  //   tag: `image`,
-  //   lastUsed: `6 hours ago`,
-  //   user: {
-  //     image: `https://previews.123rf.com/images/pandavector/pandavector1901/pandavector190105241/126078927-vector-illustration-of-avatar-and-dummy-icon-collection-of-avatar-and-image-vector-icon-for-stock-.jpg`,
-  //     name: `Adeel`,
-  //     lastUpdatedTime: `6 mins ago`,
-  //   },
-  // },
-  // {
-  //   title: `Template 3`,
-  //   image: `https://images.pexels.com/photos/4544904/pexels-photo-4544904.jpeg?cs=srgb&dl=pexels-ketut-subiyanto-4544904.jpg&fm=jpg`,
-  //   tag: `image`,
-  //   lastUsed: `6 hours ago`,
-  //   user: {
-  //     image: `https://previews.123rf.com/images/pandavector/pandavector1901/pandavector190105241/126078927-vector-illustration-of-avatar-and-dummy-icon-collection-of-avatar-and-image-vector-icon-for-stock-.jpg`,
-  //     name: `Adeel`,
-  //     lastUpdatedTime: `6 mins ago`,
-  //   },
-  // },
-  // {
-  //   title: `Template 4`,
-  //   image: `https://images.pexels.com/photos/4715334/pexels-photo-4715334.jpeg?cs=srgb&dl=pexels-cottonbro-4715334.jpg&fm=jpg`,
-  //   tag: `image`,
-  //   lastUsed: `6 hours ago`,
-  //   user: {
-  //     image: `https://previews.123rf.com/images/pandavector/pandavector1901/pandavector190105241/126078927-vector-illustration-of-avatar-and-dummy-icon-collection-of-avatar-and-image-vector-icon-for-stock-.jpg`,
-  //     name: `Adeel`,
-  //     lastUpdatedTime: `6 mins ago`,
-  //   },
-  // },
-]
 const header = (t) => {
   return (
-    <Header title={t(`media-library`)} icon="fas fa-photo-video fa-2x">
-      <div className="flex grid gap-2 sm:gap-4 grid-cols-5 sm:grid-cols-4">
+    <Header title={`Dashboard`} icon={`fas fa-folder fa-2x`}>
+      <div className="flex grid gap-2 sm:gap-4 grid-cols-5 sm:grid-cols-4 ">
         <div className="col-span-3 sm:col-span-3"></div>
         <Link href="/dashboard/organizations/addOrganization">
           <Button
@@ -134,24 +54,62 @@ const header = (t) => {
   )
 }
 const Organizations: React.FC = () => {
+  const dispatch = useDispatch()
+  const [organizations, setOrganizations] = useState<
+    allOrganization_allOrganization[]
+  >([])
   const { t } = useTranslation(`media`)
-
-  return (
-    <DashBoardLayout>
-      <div className="overflow-auto max-h-full ">
-        <Dropzone>
-          <BoxGridList<IMediaFolderCard>
-            header={header(t)}
-            Card={MediaFolderCard}
-            list={MEDIA_FOLDER_CARDS}
-          />
-          <BoxGridList<IMediaFileCard>
-            Card={MediaFileCard}
-            list={MEDIA_FILE_CARDS}
-          />
-        </Dropzone>
-      </div>
-    </DashBoardLayout>
+  const { data, loading, error } = useQuery<allOrganization>(
+    GQL_All_ORGANIZATION,
+    {
+      onCompleted: (data) => {
+        setOrganizations(data.allOrganization)
+        console.log(data.allOrganization)
+        dispatch(
+          setOrganization(
+            data.allOrganization as GqlMAddOrganization_addOrganization[],
+          ),
+        )
+      },
+    },
   )
+  // useEffect(() => {
+  //
+  // }, [organizations])
+
+  if (loading) {
+    return (
+      <h2>
+        <a href="#loading" aria-hidden="true" id="loading">
+          <svg
+            aria-hidden="true"
+            height="16"
+            version="1.1"
+            viewBox="0 0 16 16"
+            width="16"
+          >
+            <path
+              fillRule="evenodd"
+              d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"
+            ></path>
+          </svg>
+        </a>
+        Loading...
+      </h2>
+    )
+  } else
+    return (
+      <DashBoardLayout>
+        <div className="overflow-auto max-h-full ">
+          <Dropzone>
+            <BoxGridList<allOrganization_allOrganization>
+              header={header(t)}
+              Card={MediaFolderCard}
+              list={organizations}
+            />
+          </Dropzone>
+        </div>
+      </DashBoardLayout>
+    )
 }
 export default Organizations

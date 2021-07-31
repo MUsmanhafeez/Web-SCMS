@@ -1,0 +1,42 @@
+mutation modifyOrganization($modifyOrgReqDto: ModifyOrganizationReqDto!){
+    modifyOrganization(modifyOrgReqDto: $modifyOrgReqDto){
+        createdAt
+        desc
+        iName
+        id
+        location
+        name
+        ownerId
+        phone
+        totalAmount
+        type
+        updatedAt
+        users{
+            email
+            firstName
+            id
+            lastName
+            organizations{
+                createdAt
+                desc
+                iName
+                id
+                location
+                name
+                ownerId
+                phone
+                totalAmount
+                type
+                updatedAt
+                users{
+                    email
+                    firstName
+                    id
+                    lastName
+                    status
+                }
+            }
+            status
+        }
+    }
+}

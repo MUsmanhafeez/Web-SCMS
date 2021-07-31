@@ -5,8 +5,8 @@ import { OrganizationType, OrganizationStatus } from './types'
 export interface IOrganizationMemberParams {
   userId: Uuid
   orgId: Uuid
-  status: OrganizationStatus
-  type: OrganizationType
+  status?: OrganizationStatus
+  type?: OrganizationType
 }
 @Entity({ name: `organizationMembers`, schema: `organization` })
 export class OrganizationMember {

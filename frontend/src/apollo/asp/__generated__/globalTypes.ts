@@ -7,11 +7,26 @@
 // START Enums and Input Objects
 //==============================================================
 
+export enum OrganizationPostType {
+  MASJID = "MASJID",
+  OTHER = "OTHER",
+}
+
 export enum UserStatus {
   ACTIVE = "ACTIVE",
   INACTIVE = "INACTIVE",
   TERMINATED = "TERMINATED",
   UNVERIFIED = "UNVERIFIED",
+}
+
+export interface AddOrganizationReqDto {
+  desc?: string | null;
+  iName?: string | null;
+  location: string;
+  name: string;
+  phone: string;
+  totalAmount?: number | null;
+  type: OrganizationPostType;
 }
 
 //==============================================================

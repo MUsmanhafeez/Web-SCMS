@@ -32,25 +32,29 @@ directive @connection(
   filter: [String!]
 ) on FIELD
 
+input AddOrganizationReqDto {
+  desc: String
+  iName: String
+  location: String!
+  name: String!
+  phone: String!
+  totalAmount: Float
+  type: OrganizationPostType!
+}
+
 type AuthResponseDto {
   returnTo: String!
   success: Boolean!
 }
 
-type CreateAuthVerificationResDto {
-  status: Float!
-}
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type DeleteUserResponseDto {
   message: String!
   userEmail: String!
-}
-
-enum EMAIL_OUTBOX_PURPOSE {
-  ACCOUNT_REGISTRATION
-  CHANGE_EMAIL
-  OTHER
-  RESET_PASSWORD
 }
 
 type LoginResponseDto {
@@ -59,16 +63,38 @@ type LoginResponseDto {
 }
 
 type Mutation {
-  createAuthVerificationRequest(email: String!, purpose: EMAIL_OUTBOX_PURPOSE!): CreateAuthVerificationResDto!
+  addOrganization(addOrganizationReqDto: AddOrganizationReqDto!): OrganizationDto!
+  addTotalAmount(orgId: Uuid!, totalAmount: Float!): OrganizationDto!
   deleteTestUser(email: String!): DeleteUserResponseDto!
   login(email: String!, oidcInteractionUid: String!, password: String!): LoginResponseDto!
   register(email: String!, firstName: String!, lastName: String!, oidcInteractionUid: String!, password: String!): RegisterResponseDto!
   user(firstName: String, lastName: String, newPassword: String, oldPassword: String): UserDto!
-  verifyAuthVerificationRequest(otp: Float!, verificationId: Uuid!): VerifyAuthVerificationResDto!
+}
+
+type OrganizationDto {
+  createdAt: DateTime!
+  desc: String!
+  iName: String
+  id: Uuid!
+  location: String!
+  name: String!
+  ownerId: String!
+  phone: String!
+  totalAmount: Float
+  type: OrganizationPostType!
+  updatedAt: DateTime
+  users: [UserDto]
+}
+
+enum OrganizationPostType {
+  MASJID
+  OTHER
 }
 
 type Query {
-  ServerStatus: ServerStatus!
+  allOrganization: [OrganizationDto!]!
+  deleteOrganization(orgId: Uuid!): Boolean!
+  organization(listMembers: Boolean, orgId: Uuid!): OrganizationDto!
   user: UserDto!
 }
 
@@ -77,15 +103,12 @@ type RegisterResponseDto {
   user: UserDto!
 }
 
-type ServerStatus {
-  status: String!
-}
-
 type UserDto {
   email: String!
   firstName: String!
   id: Uuid!
   lastName: String!
+  organizations: [OrganizationDto]
   status: UserStatus!
 }
 
@@ -98,7 +121,3 @@ enum UserStatus {
 
 """Uuid custom scalar type from cassandra"""
 scalar Uuid
-
-type VerifyAuthVerificationResDto {
-  status: Float!
-}

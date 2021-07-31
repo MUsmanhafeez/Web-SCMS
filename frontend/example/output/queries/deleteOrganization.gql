@@ -1,0 +1,3 @@
+query deleteOrganization($orgId: Uuid!){
+    deleteOrganization(orgId: $orgId)
+}
