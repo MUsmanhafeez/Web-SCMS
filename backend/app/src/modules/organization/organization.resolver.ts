@@ -59,15 +59,14 @@ export class OrganizationResolver {
     return await this.orgService.addTotalAmount(addTotalRequestDto, user)
   }
 
-  @Query(returns => OrganizationDto, { name: `organization` })
+  @Mutation(() => OrganizationDto, { name: `enrollUser` })
   @UseGuards(GraphqlAuthGuard)
-  async getOrganization(
-    @Args()
-    { listMembers, orgId }: OrganizationRequestDto,
-    @userDecoder(`id`) userId: Uuid
+  async enrollUser(
+    @Args('orgId') orgId: Uuid,
+    @userDecoder() user: User
   ): Promise<OrganizationDto> {
-    await this.orgService.checkRelationShipExist(orgId, userId)
-    return await this.orgService.getOrganization(orgId, listMembers)
+    await this.orgService.checkRelationShipExist(orgId, user.id)
+    return await this.orgService.enrollUser(orgId, user)
   }
 
   @Query(returns => Boolean, { name: `deleteOrganization` })
@@ -86,5 +85,13 @@ export class OrganizationResolver {
     @userDecoder(`id`) userId: Uuid
   ): Promise<OrganizationDto[]> {
     return await this.orgService.getAllOrganization(userId)
+  }
+  @Query(returns => [OrganizationDto], { name: `myOrganizationList` })
+  @UseGuards(GraphqlAuthGuard)
+  async getOrganizationList(
+    @Args() { listMembers }: OrganizationListRequestDto,
+    @userDecoder() user: User
+  ): Promise<OrganizationDto[]> {
+    return await this.orgService._getUserOrganizations(user, listMembers)
   }
 }

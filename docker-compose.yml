@@ -7,6 +7,7 @@ services:
       #ADD_IN_CI dockerfile: Dockerfile.ci
     ports: #REMOVE_IN_CI
       - "${ASP_FRONTEND_APP_PORT}:${ASP_FRONTEND_APP_PORT}" #REMOVE_IN_CI
+      - "9202:9229" #REMOVE_IN_CI
     volumes: #REMOVE_IN_CI
       - ${PWD}/frontend:/home/frontend #REMOVE_IN_CI
     depends_on:
@@ -38,6 +39,7 @@ services:
       #ADD_IN_CI dockerfile: Dockerfile.ci
     ports: #REMOVE_IN_CI
       - "${ASP_BACKEND_APP_PORT}:${ASP_BACKEND_APP_PORT}" #REMOVE_IN_CI
+      - "9201:9229" #REMOVE_IN_CI
     depends_on:
       - "asp-redis"
       - "asp-postgres"

@@ -1,5 +1,5 @@
-query organization($listMembers: Boolean, $orgId: Uuid!){
-    organization(listMembers: $listMembers, orgId: $orgId){
+mutation enrollUser($orgId: Uuid!){
+    enrollUser(orgId: $orgId){
         createdAt
         desc
         iName

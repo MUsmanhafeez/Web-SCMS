@@ -14,6 +14,13 @@ import { Repository, getConnection } from 'typeorm'
 import { AddOrganizationReqDto, OrganizationMemberDto } from './dto'
 @Injectable()
 export class OrganizationService {
+  constructor(
+    @InjectRepository(Organization)
+    private orgRepo: Repository<Organization>,
+    @InjectRepository(OrganizationMember)
+    private orgMemberRepo: Repository<OrganizationMember>
+  ) {}
+
   async modifyOrganization(
     orgReqDto: ModifyOrganizationReqDto,
     user: User
@@ -22,50 +29,49 @@ export class OrganizationService {
       where: { id: orgReqDto.orgId },
       relations: [`users`]
     })
-    console.log(`previosOrg`, org)
     if (org.ownerId !== user.id.uuid)
       throw new HttpException(
         `You are Not an owner of that organization!`,
         HttpStatus.CONFLICT
       )
-
-    const newOrg = new Organization({
-      id: org.id,
-      ownerId: org.ownerId,
-      location: org.location,
-      users: org.users,
-      ...orgReqDto
-    })
-    console.log(`newOrg`, newOrg)
-
     await this.orgRepo.delete({ id: org.id })
+    org.desc = orgReqDto.desc
+    org.iName = orgReqDto.iName
+    org.name = orgReqDto.name
+    org.phone = orgReqDto.phone
 
-    await this.orgRepo.save(newOrg)
-    return new OrganizationDto(newOrg)
+    org.totalAmount && (org.totalAmount += orgReqDto.totalAmount)
+
+    await this.orgRepo.save(org)
+    return new OrganizationDto(org)
   }
-  //     relations: listMembers && [`users`]
-  //   })
-  // }
-
-  constructor(
-    @InjectRepository(Organization)
-    private orgRepo: Repository<Organization>,
-    @InjectRepository(OrganizationMember)
-    private orgMemberRepo: Repository<OrganizationMember>
-  ) {}
+  async _getUserOrganizations(
+    user: User,
+    listMembers: boolean
+  ): Promise<OrganizationDto[]> {
+    const organizations: Organization[] = await this.orgRepo.find({
+      join: {
+        alias: `organization`,
+        innerJoin: { users: `organization.users` }
+      },
+      where: (queryCondition: any) => {
+        queryCondition.where(`users.id = :userId`, { userId: user.id.uuid })
+      },
+      relations: listMembers && [`users`]
+    })
+    if (organizations.length <= 0)
+      throw new HttpException(
+        `User Does not exist in any Organization!`,
+        HttpStatus.UNAUTHORIZED
+      )
+    return organizations.map((org: Organization) => new OrganizationDto(org))
+  }
 
   async getAllOrganization(userId: Uuid): Promise<OrganizationDto[]> {
     const data = await this.orgRepo.find({
       relations: [`users`]
     })
     return data.map(res => new OrganizationDto(res))
-  }
-
-  getOrganization(
-    orgId: Uuid,
-    listMembers: boolean
-  ): OrganizationDto | PromiseLike<OrganizationDto> {
-    throw new Error(`Method not implemented.`)
   }
 
   async deleteOrganization(orgId: Uuid, userId: Uuid): Promise<boolean> {
@@ -86,7 +92,7 @@ export class OrganizationService {
   async addTotalAmount(
     addTotalRequestDto: AddTotalRequestDto,
     user: User
-  ) /* Promise<OrganizationDto>  */ {
+  ): Promise<OrganizationDto> {
     const org = await this.orgRepo.findOne({
       where: { id: addTotalRequestDto.orgId },
       relations: [`users`]
@@ -106,6 +112,19 @@ export class OrganizationService {
     // }
     !findUser && org.users.push(user)
     org.totalAmount += addTotalRequestDto.totalAmount
+    await this.orgRepo.save(org)
+    return new OrganizationDto(org)
+  }
+
+  async enrollUser(orgId: Uuid, user: User): Promise<OrganizationDto> {
+    const org = await this.orgRepo.findOne({
+      where: { id: orgId },
+      relations: [`users`]
+    })
+    await this.orgRepo.delete({ id: org.id })
+    const findUser = org.users.find(item => item.id.uuid === user.id.uuid)
+
+    !findUser && org.users.push(user)
     await this.orgRepo.save(org)
     return new OrganizationDto(org)
   }

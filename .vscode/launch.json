@@ -1,0 +1,35 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach to Backend App",
+      "address": "localhost",
+      "port": 9201,
+      "localRoot": "${workspaceFolder}/backend/app",
+      "remoteRoot": "/home/backend/app",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach to Microservice Media App",
+      "address": "localhost",
+      "port": 9211,
+      "localRoot": "${workspaceFolder}/backend/microservices/media",
+      "remoteRoot": "/home/backend/microservices/media",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach to Frontend App",
+      "address": "localhost",
+      "port": 9202,
+      "localRoot": "${workspaceFolder}/frontend",
+      "remoteRoot": "/home/frontend",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}

@@ -11,15 +11,27 @@ import { Button } from '@components/tail-kit/elements/buttons/Button'
 import { DOCUMENT } from '@config'
 import { Checkbox as CheckboxGroup } from '@components/tail-kit/form/toggle/Checkbox'
 
-import { useMutation } from '@apollo/client'
-import { GQLM_ADD_ORGANIZARION } from '@entities/asp/organization'
+import { useLazyQuery, useMutation } from '@apollo/client'
+import {
+  GQLM_ADD_ORGANIZARION,
+  GQLM_ENROLL_ORGANIZATION,
+  GQLM_UPDATE_ORG,
+  GQL_DELETE_ORGANIZATION,
+} from '@entities/asp/organization'
 import {
   OrganizationPostType,
   GqlMAddOrganization,
   GqlMAddOrganizationVariables,
   GqlMAddOrganization_addOrganization,
+  GQLdeleteOrganization,
+  GQLdeleteOrganizationVariables,
+  GqlMModifyOrganization,
+  GqlMModifyOrganizationVariables,
+  GqlMEnrollUser,
+  GqlMEnrollUserVariables,
 } from '@gqlTypes/asp'
 import { BandeauLineAlert } from '@components/tail-kit/elements/alert/BandeauLineAlert'
+import router from 'next/router'
 
 export interface ICheckboxState {
   id: number
@@ -27,29 +39,8 @@ export interface ICheckboxState {
   checked: boolean
 }
 export const OthersForm = () => {
-  const userState = useSelector((state: RootState) => state.user.user)
-  const [item, setItem] = useState<GqlMAddOrganization_addOrganization>()
-  const orgState = useSelector((state: RootState) => state.organization)
-  const [isOwner, setIsOwner] = useState(true)
-
-  useEffect(() => {
-    const activeOrg = orgState.organizations.find(
-      (item) => item.id === orgState.activeOrgId,
-    )
-    setItem(activeOrg)
-
-    // console.log(`item id = ${item?.ownerId} userid = ${userState.id}`)
-  }, [orgState])
-
-  useEffect(() => {
-    setIsOwner(item?.ownerId === userState?.id)
-  }, [userState, item])
-
-  // const [isMasjid, setIsMasjid] = useState(
-  //   checkboxes.filter((cb) => cb.title === `Masjid`)[0].checked,
-  // )
-
   const initialFormData = {
+    orgId: ``,
     email: ``,
     name: ``,
     desc: ``,
@@ -57,9 +48,26 @@ export const OthersForm = () => {
     phone: ``,
     postType: ``,
   }
+  const userState = useSelector((state: RootState) => state.user.user)
+  const [item, setItem] = useState<GqlMAddOrganization_addOrganization>()
+  const orgState = useSelector((state: RootState) => state.organization)
+  const [isOwner, setIsOwner] = useState(true)
   const [formData, setFormData] = useState(initialFormData)
+
   useEffect(() => {
-    return setFormData({
+    const activeOrg = orgState.organizations.find(
+      (item) => item.id === orgState.activeOrgId,
+    )
+    setItem(activeOrg)
+  }, [orgState])
+
+  useEffect(() => {
+    setIsOwner(item?.ownerId === userState?.id)
+  }, [userState, item])
+
+  useEffect(() => {
+    setFormData({
+      orgId: item?.id || ``,
       email: item?.users.find((user) => user.id === item.ownerId).email || ``,
       name: item?.name || ``,
       desc: item?.desc || ``,
@@ -68,31 +76,41 @@ export const OthersForm = () => {
       postType: OrganizationPostType.OTHER || ``,
     })
   }, [item])
-  // const [formData, setFormData] = useState(initialFormData)
-  // useEffect(() => {
-  //   setFormData({
-  //     email: userState.email,
-  //     name: ``,
-  //     desc: ``,
-  //     location: ``,
-  //     phone: ``,
-  //     postType: ``,
-  //     totalAmount: 0,
-  //   })
-  // }, [userState])
-  console.log(`item = ${JSON.stringify(item)}`)
-  console.log(`isOwner = ${JSON.stringify(isOwner)}`)
-  console.log(`userState = ${JSON.stringify(userState)}`)
-  const [addOrg, { data, error, loading }] = useMutation<
-    GqlMAddOrganization,
-    GqlMAddOrganizationVariables
-  >(GQLM_ADD_ORGANIZARION, {
+
+  const [delOrganization] = useLazyQuery<
+    GQLdeleteOrganization,
+    GQLdeleteOrganizationVariables
+  >(GQL_DELETE_ORGANIZATION, {
     onCompleted: (data) => {
-      console.log(data)
+      router.push(`/dashboard/organizations`)
+    },
+  })
+  const [updateOrg, { data, error, loading }] = useMutation<
+    GqlMModifyOrganization,
+    GqlMModifyOrganizationVariables
+  >(GQLM_UPDATE_ORG, {
+    onCompleted: ({ modifyOrganization }) => {
+      setFormData({
+        ...formData,
+        desc: modifyOrganization.desc,
+        name: modifyOrganization.name,
+        orgId: modifyOrganization.id,
+        phone: modifyOrganization.phone,
+      })
     },
     onError: (err) => console.log(err),
   })
-
+  const [enrollUser] = useMutation<GqlMEnrollUser, GqlMEnrollUserVariables>(
+    GQLM_ENROLL_ORGANIZATION,
+    {
+      onCompleted: (data) => {
+        setFormData({
+          ...formData,
+        })
+      },
+      onError: (err) => console.log(err),
+    },
+  )
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: { ...formData },
@@ -108,21 +126,38 @@ export const OthersForm = () => {
       totalAmount: Yup.number(),
     }),
 
-    onSubmit: ({ name, desc, email, location, phone }) => {
-      const type = OrganizationPostType.OTHER
-      addOrg({
-        variables: {
-          addOrganizationReqDto: {
-            location,
-            name,
-            phone: `${phone}`,
-            type,
-            desc,
-          },
-        },
-      })
+    onSubmit: (e) => {
+      console.log(`in submit`)
     },
   })
+  const handleDelete = () => {
+    delOrganization({
+      variables: {
+        orgId: item.id,
+      },
+    })
+  }
+  const handleUpdate = () => {
+    console.log(formData)
+    updateOrg({
+      variables: {
+        modifyOrgReqDto: {
+          desc: formData.desc,
+          name: formData.name,
+          orgId: formData.orgId,
+          phone: formData.phone,
+          type: OrganizationPostType.OTHER,
+        },
+      },
+    })
+  }
+  const handleEnrollUser = () => {
+    enrollUser({
+      variables: {
+        orgId: item.id,
+      },
+    })
+  }
   if (!userState) {
     return <div>Not ready</div>
   } else {
@@ -152,8 +187,10 @@ export const OthersForm = () => {
                 type="text"
                 disabled={!isOwner}
                 placeholder={`Enter Organization Name`}
-                value={formik.values.name}
-                onChange={formik.handleChange}
+                value={formData.name || ``}
+                onChange={(e) => {
+                  setFormData({ ...formData, name: e.target.value })
+                }}
                 error={
                   formik.touched.name &&
                   formik.errors.name &&
@@ -172,8 +209,10 @@ export const OthersForm = () => {
                 type="text"
                 disabled={!isOwner}
                 placeholder={`Enter Your Contact Number`}
-                value={formik.values.phone || ``}
-                onChange={formik.handleChange}
+                value={formData.phone || ``}
+                onChange={(e) => {
+                  setFormData({ ...formData, phone: e.target.value })
+                }}
                 error={
                   formik.touched.phone &&
                   formik.errors.phone &&
@@ -193,8 +232,10 @@ export const OthersForm = () => {
                 type="text"
                 disabled={!isOwner}
                 placeholder={`Description`}
-                value={formik.values.desc || ``}
-                onChange={formik.handleChange}
+                value={formData.desc || ``}
+                onChange={(e) => {
+                  setFormData({ ...formData, desc: e.target.value })
+                }}
                 error={
                   formik.touched.desc &&
                   formik.errors.desc &&
@@ -214,7 +255,10 @@ export const OthersForm = () => {
                 disabled
                 placeholder={`Location`}
                 value={formik.values.location || ``}
-                onChange={formik.handleChange}
+                onChange={(e) => {
+                  formik.handleChange(e)
+                  setFormData({ ...formData, location: e.target.value })
+                }}
                 error={
                   formik.touched.location &&
                   formik.errors.location &&
@@ -255,6 +299,7 @@ export const OthersForm = () => {
                     color="gray"
                     submit={true}
                     className="  py-2 px-4 mx-5 ml-8 bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg    py-2  bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg  mt-5 h-10 md:w-1/3 text-center"
+                    onClick={handleUpdate}
                     isloading={loading}
                   />
                   <Button
@@ -262,6 +307,7 @@ export const OthersForm = () => {
                     color="gray"
                     submit={true}
                     className=" py-2 px-4  bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg    py-2  bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg  mt-5 h-10 md:w-1/3 text-center"
+                    onClick={handleDelete}
                     isloading={loading}
                   />
                 </>
@@ -273,7 +319,7 @@ export const OthersForm = () => {
                 <Button
                   label={`Join Organization`}
                   color="gray"
-                  submit={true}
+                  onClick={handleEnrollUser}
                   className=" py-2 px-4 pr-5 bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg md:w-4/5 mt-5 h-10 text-center"
                   isloading={loading}
                 />

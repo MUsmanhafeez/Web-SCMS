@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { DashBoardLayout } from '@components/dashboard/layout'
 import { Header } from '@components/layout/Header'
 import { Button } from '@components/tail-kit/elements/buttons/Button'
@@ -17,10 +17,17 @@ import {
   GqlMAddOrganization_addOrganization,
 } from '@gqlTypes/asp'
 import { useQuery } from '@apollo/client'
-import { GQL_All_ORGANIZATION } from '@entities/asp/organization'
+import {
+  GQL_All_ORGANIZATION,
+  GQL_MY_ORGANIZATION,
+} from '@entities/asp/organization'
 // import { InputText } from '@components/tail-kit/form/input-text/InputText'
 import { useDispatch } from 'react-redux'
 import { setOrganization } from '@redux/actions'
+import {
+  myOrganizationList,
+  myOrganizationListVariables,
+} from '@gqlTypes/asp/__generated__/myOrganizationList'
 export interface IMediaFolderCard {
   name: string
   desc: string
@@ -36,40 +43,9 @@ export interface IMediaFileCard {
   user: ITemplateUser
 }
 
-// {
-//   id: `2`,
-//   title: `Template 2`,
-//   icon: `fas fa-folder fa-lg mr-3 text-primary`,
-// },
-// {
-//   id: `3`,
-//   title: `Template 3`,
-//   icon: `fas fa-folder fa-lg mr-3 text-primary`,
-// },
-// {
-//   id: `4`,
-//   title: `Template 4`,
-//   icon: `fas fa-folder fa-lg mr-3 text-primary`,
-// },
-// {
-//   id: `2`,
-//   title: `Template 2`,
-//   icon: `fas fa-folder fa-lg mr-3 text-primary`,
-// },
-// {
-//   id: `3`,
-//   title: `Template 3`,
-//   icon: `fas fa-folder fa-lg mr-3 text-primary`,
-// },
-// {
-//   id: `4`,
-//   title: `Template 4`,
-//   icon: `fas fa-folder fa-lg mr-3 text-primary`,
-// },
-
 const header = (t) => {
   return (
-    <Header title={`My Organizations`} icon={`fas fa-folder fa-2x`}>
+    <Header title={`Dashboard`} icon={`fas fa-folder fa-2x`}>
       <div className="flex grid gap-2 sm:gap-4 grid-cols-5 sm:grid-cols-4 ">
         <div className="col-span-3 sm:col-span-3"></div>
         <Link href="/dashboard/organizations/addOrganization">
@@ -90,20 +66,28 @@ const Organizations: React.FC = () => {
     allOrganization_allOrganization[]
   >([])
   const { t } = useTranslation(`media`)
-  const { data, loading, error } = useQuery<allOrganization>(
-    GQL_All_ORGANIZATION,
+  const { data, loading, error } = useQuery<
+    myOrganizationList,
+    myOrganizationListVariables
+  >(
+    GQL_MY_ORGANIZATION,
+
     {
+      variables: { listMembers: true },
       onCompleted: (data) => {
-        setOrganizations(data.allOrganization)
-        console.log(data.allOrganization)
+        setOrganizations(data.myOrganizationList)
+        console.log(data.myOrganizationList)
         dispatch(
           setOrganization(
-            data.allOrganization as GqlMAddOrganization_addOrganization[],
+            data.myOrganizationList as GqlMAddOrganization_addOrganization[],
           ),
         )
       },
     },
   )
+  // useEffect(() => {
+  //
+  // }, [organizations])
 
   if (loading) {
     return (

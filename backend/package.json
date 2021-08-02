@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@apollo/gateway": "^0.35.1"
+  }
+}

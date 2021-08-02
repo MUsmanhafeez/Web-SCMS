@@ -13,6 +13,8 @@ import { DOCUMENT } from '@config'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import {
   GQLM_ADD_TOTALAMOUNT,
+  GQLM_ENROLL_ORGANIZATION,
+  GQLM_UPDATE_ORG,
   GQL_DELETE_ORGANIZATION,
 } from '@entities/asp/organization'
 import {
@@ -20,6 +22,10 @@ import {
   GqlMAddOrganization_addOrganization,
   GqlMAddTotalAmount,
   GqlMAddTotalAmountVariables,
+  GqlMModifyOrganization,
+  GqlMModifyOrganizationVariables,
+  GqlMEnrollUser,
+  GqlMEnrollUserVariables,
 } from '@gqlTypes/asp'
 import { BandeauLineAlert } from '@components/tail-kit/elements/alert/BandeauLineAlert'
 import { useRouter } from 'next/router'
@@ -34,6 +40,7 @@ export interface ICheckboxState {
 }
 export const MasjidForm = () => {
   const initialFormData = {
+    orgId: ``,
     email: ``,
     name: ``,
     iName: ``,
@@ -67,6 +74,7 @@ export const MasjidForm = () => {
 
   useEffect(() => {
     setFormData({
+      orgId: item?.id || ``,
       email: item?.users.find((user) => user.id === item.ownerId).email || ``,
       name: item?.name || ``,
       iName: item?.iName || ``,
@@ -78,7 +86,7 @@ export const MasjidForm = () => {
       addedAmount: 0,
     })
   }, [item])
-  const [addTotalAmount, { data, error, loading }] = useMutation<
+  const [addTotalAmount] = useMutation<
     GqlMAddTotalAmount,
     GqlMAddTotalAmountVariables
   >(GQLM_ADD_TOTALAMOUNT, {
@@ -91,6 +99,32 @@ export const MasjidForm = () => {
     },
     onError: (err) => console.log(err),
   })
+
+  const [updateOrg, { data, error, loading }] = useMutation<
+    GqlMModifyOrganization,
+    GqlMModifyOrganizationVariables
+  >(GQLM_UPDATE_ORG, {
+    onCompleted: (data) => {
+      setFormData({
+        ...formData,
+        totalAmount: data.modifyOrganization.totalAmount,
+        addedAmount: 0,
+      })
+    },
+    onError: (err) => console.log(err),
+  })
+
+  const [enrollUser] = useMutation<GqlMEnrollUser, GqlMEnrollUserVariables>(
+    GQLM_ENROLL_ORGANIZATION,
+    {
+      onCompleted: (data) => {
+        setFormData({
+          ...formData,
+        })
+      },
+      onError: (err) => console.log(err),
+    },
+  )
   const [delOrganization] = useLazyQuery<
     GQLdeleteOrganization,
     GQLdeleteOrganizationVariables
@@ -119,19 +153,6 @@ export const MasjidForm = () => {
 
     onSubmit: () => {
       console.log(`in submit`)
-
-      // addOrg({
-      //   variables: {
-      //     addOrganizationReqDto: {
-      //       location,
-      //       name,
-      //       phone: `${phone}`,
-      //       type,
-      //       desc,
-      //       iName,
-      //     },
-      //   },
-      // })
     },
   })
   const handleAddAmount = () => {
@@ -150,11 +171,29 @@ export const MasjidForm = () => {
     })
   }
 
+  const handleUpdate = () => {
+    console.log(formData)
+    console.log(formData.totalAmount + formData.addedAmount)
+    updateOrg({
+      variables: {
+        modifyOrgReqDto: {
+          desc: formData.desc,
+          name: formData.name,
+          orgId: formData.orgId,
+          phone: formData.phone,
+          iName: formData.iName,
+          totalAmount: formData.addedAmount,
+          type: OrganizationPostType.MASJID,
+        },
+      },
+    })
+  }
+
   if (!userState) {
     return <div>Not ready</div>
   } else {
     return (
-      <FormLayout title={`Add Organization`} imgSrc={DOCUMENT.logo}>
+      <FormLayout title={`Masjid Form`} imgSrc={DOCUMENT.logo}>
         <form onSubmit={formik.handleSubmit}>
           <div className="items-center w-full  py-2  text-gray-500 md:inline-flex md:space-y-0">
             <h2 className="max-w-sm mx-auto md:w-1/3">Account</h2>
@@ -179,10 +218,9 @@ export const MasjidForm = () => {
                 type="text"
                 disabled={!isOwner}
                 placeholder={`Enter Masjid Name`}
-                value={formik.values.name}
+                value={formData.name || ``}
                 onChange={(e) => {
-                  formik.handleChange(e)
-                  setFormData({ ...formData, name: formik.values.name })
+                  setFormData({ ...formData, name: e.target.value })
                 }}
                 error={
                   formik.touched.name &&
@@ -203,10 +241,9 @@ export const MasjidForm = () => {
                 type="text"
                 disabled={!isOwner}
                 placeholder={`Enter Imam Name`}
-                value={formik.values.iName || ``}
+                value={formData.iName || ``}
                 onChange={(e) => {
-                  formik.handleChange(e)
-                  setFormData({ ...formData, iName: formik.values.iName })
+                  setFormData({ ...formData, iName: e.target.value })
                 }}
                 error={
                   formik.touched.iName &&
@@ -227,10 +264,9 @@ export const MasjidForm = () => {
                 type="text"
                 disabled={!isOwner}
                 placeholder={`Enter Your Contact Number`}
-                value={formik.values.phone || ``}
+                value={formData.phone || ``}
                 onChange={(e) => {
-                  formik.handleChange(e)
-                  setFormData({ ...formData, phone: formik.values.phone })
+                  setFormData({ ...formData, phone: e.target.value })
                 }}
                 error={
                   formik.touched.phone &&
@@ -251,10 +287,9 @@ export const MasjidForm = () => {
                 type="text"
                 disabled={!isOwner}
                 placeholder={`Description`}
-                value={formik.values.desc || ``}
+                value={formData.desc || ``}
                 onChange={(e) => {
-                  formik.handleChange(e)
-                  setFormData({ ...formData, desc: formik.values.desc })
+                  setFormData({ ...formData, desc: e.target.value })
                 }}
                 error={
                   formik.touched.desc &&
@@ -277,7 +312,7 @@ export const MasjidForm = () => {
                 value={formik.values.location || ``}
                 onChange={(e) => {
                   formik.handleChange(e)
-                  setFormData({ ...formData, location: formik.values.location })
+                  setFormData({ ...formData, location: e.target.value })
                 }}
                 error={
                   formik.touched.location &&
@@ -313,12 +348,11 @@ export const MasjidForm = () => {
                 name="addedAmount"
                 type="number"
                 placeholder={`Enter Ammount`}
-                value={formik.values.addedAmount || ``}
+                value={formData.addedAmount || ``}
                 onChange={(e) => {
-                  formik.handleChange(e)
                   setFormData({
                     ...formData,
-                    addedAmount: formik.values.addedAmount,
+                    addedAmount: Number(e.target.value),
                   })
                 }}
                 error={
@@ -340,7 +374,7 @@ export const MasjidForm = () => {
           <div className="m-3">
             {data ? (
               <BandeauLineAlert
-                title="Organization Updated Sucessfully !"
+                title="Organization Updated Successfully !"
                 borderColor="border-gray-600"
                 color="text-gray-500"
               />
@@ -364,6 +398,7 @@ export const MasjidForm = () => {
                     color="gray"
                     className="  py-2 px-4 mx-5 ml-8 bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg    py-2  bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg  mt-5 h-10 md:w-1/3 text-center"
                     isloading={loading}
+                    onClick={handleUpdate}
                   />
                   <Button
                     label={`Delete`}

@@ -62,11 +62,23 @@ type LoginResponseDto {
   user: UserDto!
 }
 
+input ModifyOrganizationReqDto {
+  desc: String
+  iName: String
+  name: String!
+  orgId: Uuid!
+  phone: String!
+  totalAmount: Float
+  type: OrganizationPostType!
+}
+
 type Mutation {
   addOrganization(addOrganizationReqDto: AddOrganizationReqDto!): OrganizationDto!
   addTotalAmount(orgId: Uuid!, totalAmount: Float!): OrganizationDto!
   deleteTestUser(email: String!): DeleteUserResponseDto!
+  enrollUser(orgId: Uuid!): OrganizationDto!
   login(email: String!, oidcInteractionUid: String!, password: String!): LoginResponseDto!
+  modifyOrganization(modifyOrgReqDto: ModifyOrganizationReqDto!): OrganizationDto!
   register(email: String!, firstName: String!, lastName: String!, oidcInteractionUid: String!, password: String!): RegisterResponseDto!
   user(firstName: String, lastName: String, newPassword: String, oldPassword: String): UserDto!
 }
@@ -94,7 +106,7 @@ enum OrganizationPostType {
 type Query {
   allOrganization: [OrganizationDto!]!
   deleteOrganization(orgId: Uuid!): Boolean!
-  organization(listMembers: Boolean, orgId: Uuid!): OrganizationDto!
+  myOrganizationList(listMembers: Boolean): [OrganizationDto!]!
   user: UserDto!
 }
 

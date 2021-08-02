@@ -61,6 +61,7 @@ const Organizations: React.FC = () => {
   const { t } = useTranslation(`media`)
   const { data, loading, error } = useQuery<allOrganization>(
     GQL_All_ORGANIZATION,
+
     {
       onCompleted: (data) => {
         setOrganizations(data.allOrganization)

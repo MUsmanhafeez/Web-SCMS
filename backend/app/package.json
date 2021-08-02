@@ -125,7 +125,7 @@
     "moduleNameMapper": {
       "@lib/graphql/(.*)": "<rootDir>/libs/graphql/src/$1",
       "@lib/graphql": "<rootDir>/libs/graphql/src"
-     }
+    }
   },
   "husky": {
     "hooks": {

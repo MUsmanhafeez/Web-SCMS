@@ -88,9 +88,141 @@ export const GQLM_ADD_TOTALAMOUNT = gql`
     }
   }
 `
+export const GQLM_UPDATE_ORG = gql`
+  mutation GqlMModifyOrganization($modifyOrgReqDto: ModifyOrganizationReqDto!) {
+    modifyOrganization(modifyOrgReqDto: $modifyOrgReqDto) {
+      createdAt
+      desc
+      iName
+      id
+      location
+      name
+      ownerId
+      phone
+      totalAmount
+      type
+      updatedAt
+      users {
+        email
+        firstName
+        id
+        lastName
+        organizations {
+          createdAt
+          desc
+          iName
+          id
+          location
+          name
+          ownerId
+          phone
+          totalAmount
+          type
+          updatedAt
+          users {
+            email
+            firstName
+            id
+            lastName
+            status
+          }
+        }
+        status
+      }
+    }
+  }
+`
+export const GQLM_ENROLL_ORGANIZATION = gql`
+  mutation GqlMEnrollUser($orgId: Uuid!) {
+    enrollUser(orgId: $orgId) {
+      createdAt
+      desc
+      iName
+      id
+      location
+      name
+      ownerId
+      phone
+      totalAmount
+      type
+      updatedAt
+      users {
+        email
+        firstName
+        id
+        lastName
+        organizations {
+          createdAt
+          desc
+          iName
+          id
+          location
+          name
+          ownerId
+          phone
+          totalAmount
+          type
+          updatedAt
+          users {
+            email
+            firstName
+            id
+            lastName
+            status
+          }
+        }
+        status
+      }
+    }
+  }
+`
 export const GQL_All_ORGANIZATION = gql`
   query allOrganization {
     allOrganization {
+      createdAt
+      desc
+      iName
+      id
+      location
+      name
+      ownerId
+      phone
+      totalAmount
+      type
+      updatedAt
+      users {
+        email
+        firstName
+        id
+        lastName
+        organizations {
+          createdAt
+          desc
+          iName
+          id
+          location
+          name
+          ownerId
+          phone
+          totalAmount
+          type
+          updatedAt
+          users {
+            email
+            firstName
+            id
+            lastName
+            status
+          }
+        }
+        status
+      }
+    }
+  }
+`
+export const GQL_MY_ORGANIZATION = gql`
+  query myOrganizationList($listMembers: Boolean) {
+    myOrganizationList(listMembers: $listMembers) {
       createdAt
       desc
       iName

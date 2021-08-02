@@ -29,6 +29,16 @@ export interface AddOrganizationReqDto {
   type: OrganizationPostType;
 }
 
+export interface ModifyOrganizationReqDto {
+  desc?: string | null;
+  iName?: string | null;
+  name: string;
+  orgId: Uuid;
+  phone: string;
+  totalAmount?: number | null;
+  type: OrganizationPostType;
+}
+
 //==============================================================
 // END Enums and Input Objects
 //==============================================================
