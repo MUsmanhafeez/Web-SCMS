@@ -45,6 +45,7 @@ export class OrganizationService {
     await this.orgRepo.save(org)
     return new OrganizationDto(org)
   }
+
   async _getUserOrganizations(
     user: User,
     listMembers: boolean

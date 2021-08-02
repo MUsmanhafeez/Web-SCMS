@@ -62,7 +62,7 @@ export class OrganizationResolver {
   @Mutation(() => OrganizationDto, { name: `enrollUser` })
   @UseGuards(GraphqlAuthGuard)
   async enrollUser(
-    @Args('orgId') orgId: Uuid,
+    @Args(`orgId`) orgId: Uuid,
     @userDecoder() user: User
   ): Promise<OrganizationDto> {
     await this.orgService.checkRelationShipExist(orgId, user.id)
@@ -86,6 +86,7 @@ export class OrganizationResolver {
   ): Promise<OrganizationDto[]> {
     return await this.orgService.getAllOrganization(userId)
   }
+
   @Query(returns => [OrganizationDto], { name: `myOrganizationList` })
   @UseGuards(GraphqlAuthGuard)
   async getOrganizationList(
