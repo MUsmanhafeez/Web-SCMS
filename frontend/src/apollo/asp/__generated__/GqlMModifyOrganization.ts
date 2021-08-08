@@ -24,6 +24,7 @@ export interface GqlMModifyOrganization_modifyOrganization_users_organizations {
   desc: string;
   iName: string | null;
   id: Uuid;
+  images: string[] | null;
   location: string;
   name: string;
   ownerId: string;
@@ -50,6 +51,7 @@ export interface GqlMModifyOrganization_modifyOrganization {
   desc: string;
   iName: string | null;
   id: Uuid;
+  images: string[] | null;
   location: string;
   name: string;
   ownerId: string;

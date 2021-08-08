@@ -37,6 +37,7 @@ export class OrganizationDto {
       this.type = org.type
       this.ownerId = org.ownerId
       this.totalAmount = org.totalAmount
+      this.images = org.images as string[]
     }
   }
 
@@ -65,6 +66,9 @@ export class OrganizationDto {
 
   @Field()
   ownerId: string
+
+  @Field(type => [String], { nullable: true })
+  images: string[]
 
   @Field(type => OrganizationPostType)
   type: OrganizationPostType
@@ -142,6 +146,9 @@ export class AddOrganizationReqDto {
 
   @Field({ nullable: true })
   totalAmount: number
+
+  @Field(type => [String], { nullable: true })
+  images: string[]
 
   @Field(() => OrganizationPostType)
   @IsEnum(OrganizationPostType)

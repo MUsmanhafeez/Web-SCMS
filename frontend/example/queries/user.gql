@@ -9,6 +9,7 @@ query user{
             desc
             iName
             id
+            images
             location
             name
             ownerId
@@ -26,6 +27,7 @@ query user{
                     desc
                     iName
                     id
+                    images
                     location
                     name
                     ownerId

@@ -24,6 +24,7 @@ export interface IOrganizationParams {
   ownerId?: string
   createdAt?: Date
   updatedAt?: Date
+  images?: string[] | string
 }
 
 @Entity({ name: `organization`, schema: `organization` })
@@ -39,6 +40,7 @@ export class Organization {
       this.users = params.users
       this.ownerId = params.ownerId
       this.totalAmount = params.totalAmount
+      this.images = JSON.stringify(params.images)
     }
   }
 
@@ -70,6 +72,10 @@ export class Organization {
   @Index()
   @Column()
   location: string
+
+  @Index()
+  @Column({ nullable: true })
+  images: string
 
   @Index()
   @Column({ nullable: true })
@@ -112,7 +118,8 @@ export class Organization {
       type: this.type,
       createdAt: this.createdAt,
       totalAmount: this.totalAmount,
-      ownerId: this.ownerId
+      ownerId: this.ownerId,
+      ...(this.images !== '' && { images: JSON.parse(this.images) })
     }
   }
 }

@@ -172,6 +172,16 @@ export const MasjidForm = () => {
     })
   }
 
+  const confirmDelete = () => {
+    let txt
+    if (confirm(`Do you want yo Delete your post`)) {
+      txt = `You pressed Yes!`
+      handleDelete()
+    } else {
+      txt = `You pressed No!`
+    }
+  }
+
   const handleUpdate = () => {
     console.log(formData)
     console.log(formData.totalAmount + formData.addedAmount)
@@ -188,6 +198,15 @@ export const MasjidForm = () => {
         },
       },
     })
+  }
+  const confirmUpdate = () => {
+    let txt
+    if (confirm(`Do you want yo update your post`)) {
+      txt = `You pressed Yes!`
+      handleUpdate()
+    } else {
+      txt = `You pressed No!`
+    }
   }
 
   if (!userState) {
@@ -399,13 +418,13 @@ export const MasjidForm = () => {
                     color="gray"
                     className="  py-2 px-4 mx-5 ml-8 bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg    py-2  bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg  mt-5 h-10 md:w-1/3 text-center"
                     isloading={loading}
-                    onClick={handleUpdate}
+                    onClick={confirmUpdate}
                   />
                   <Button
                     label={`Delete`}
                     color="gray"
                     className="py-2 px-4  bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg    py-2  bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg  mt-5 h-10 md:w-1/3 text-center"
-                    onClick={handleDelete}
+                    onClick={confirmDelete}
                     isloading={loading}
                   />
                 </>

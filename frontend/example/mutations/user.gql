@@ -9,6 +9,7 @@ mutation user($firstName: String, $lastName: String, $newPassword: String, $oldP
             desc
             iName
             id
+            images
             location
             name
             ownerId
@@ -26,6 +27,7 @@ mutation user($firstName: String, $lastName: String, $newPassword: String, $oldP
                     desc
                     iName
                     id
+                    images
                     location
                     name
                     ownerId

@@ -34,7 +34,7 @@ export const MediaFolderCard: FC<IMediaFolderCardProps> = ({ item }) => {
           onClick={handleActiveClick}
         >
           <div className=" dark:bg-gray-500 w-full p-1 rounded-lg">
-            <div className="bg-white flex grid  grid-cols-5 gap-4">
+            <div className="bg-white flex grid  grid-cols-5 gap-1">
               <div className="col-span-4 flex items-center">
                 <p className="col-span-100 text-gray-800 dark:text-white overflow-hidden pt-1 pl-2 text-2xl  width: 100% h-10">
                   {/* {item.icon && <i className={item.icon} />} */}
@@ -47,9 +47,14 @@ export const MediaFolderCard: FC<IMediaFolderCardProps> = ({ item }) => {
                   {new Date(item.createdAt).toLocaleDateString(`en-US`)}
                 </p>
               </div>
+              <div className="col-span-5 flex flex-col ">
+                <img
+                  alt="blog photo"
+                  src={item.images[0] || DOCUMENT.noImage}
+                  className="rounded-t-lg h-48 w-full object-contain text-right"
+                />
 
-              <div className="col-span-4 flex items-center ">
-                <p className="col-span-100 text-gray-800 dark:text-white overflow-hidden font-medium width: 100%  pl-2 pb-2">
+                <p className="col-span-100 text-gray-800 dark:text-white overflow-hidden font-medium width: 100%  pl-4 pb-2">
                   {/* {item.icon && <i className={item.icon} />} */}
                   {item.desc}
                 </p>

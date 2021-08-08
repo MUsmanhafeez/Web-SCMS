@@ -35,6 +35,7 @@ directive @connection(
 input AddOrganizationReqDto {
   desc: String
   iName: String
+  images: [String!]
   location: String!
   name: String!
   phone: String!
@@ -88,6 +89,7 @@ type OrganizationDto {
   desc: String!
   iName: String
   id: Uuid!
+  images: [String!]
   location: String!
   name: String!
   ownerId: String!

@@ -4,6 +4,7 @@ mutation enrollUser($orgId: Uuid!){
         desc
         iName
         id
+        images
         location
         name
         ownerId
@@ -21,6 +22,7 @@ mutation enrollUser($orgId: Uuid!){
                 desc
                 iName
                 id
+                images
                 location
                 name
                 ownerId

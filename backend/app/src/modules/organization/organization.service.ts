@@ -43,7 +43,7 @@ export class OrganizationService {
     org.totalAmount && (org.totalAmount += orgReqDto.totalAmount)
 
     await this.orgRepo.save(org)
-    return new OrganizationDto(org)
+    return new OrganizationDto(org.getOrganization())
   }
 
   async _getUserOrganizations(
@@ -65,14 +65,17 @@ export class OrganizationService {
         `User Does not exist in any Organization!`,
         HttpStatus.UNAUTHORIZED
       )
-    return organizations.map((org: Organization) => new OrganizationDto(org))
+    return organizations.map(
+      (org: Organization) => new OrganizationDto(org.getOrganization())
+    )
   }
 
   async getAllOrganization(userId: Uuid): Promise<OrganizationDto[]> {
     const data = await this.orgRepo.find({
       relations: [`users`]
     })
-    return data.map(res => new OrganizationDto(res))
+    console.log(data)
+    return data.map(res => new OrganizationDto(res.getOrganization()))
   }
 
   async deleteOrganization(orgId: Uuid, userId: Uuid): Promise<boolean> {
@@ -114,7 +117,7 @@ export class OrganizationService {
     !findUser && org.users.push(user)
     org.totalAmount += addTotalRequestDto.totalAmount
     await this.orgRepo.save(org)
-    return new OrganizationDto(org)
+    return new OrganizationDto(org.getOrganization())
   }
 
   async enrollUser(orgId: Uuid, user: User): Promise<OrganizationDto> {
@@ -127,7 +130,7 @@ export class OrganizationService {
 
     !findUser && org.users.push(user)
     await this.orgRepo.save(org)
-    return new OrganizationDto(org)
+    return new OrganizationDto(org.getOrganization())
   }
 
   async addOrganization(
@@ -143,6 +146,7 @@ export class OrganizationService {
       type: orgParam.type,
       ownerId: user.id.uuid,
       totalAmount: orgParam.totalAmount,
+      images: orgParam.images,
       users: [user]
     })
     const savedOrganization = await this.orgRepo.save(_org)

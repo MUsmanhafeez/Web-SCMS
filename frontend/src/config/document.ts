@@ -5,6 +5,7 @@ export const DOCUMENT = {
   logo1: `/images/logo/logo1.png`,
   scms_logo: `/images/logo/Logo.png`,
   call_logo: `/images/logo/call button logo.png`,
+  noImage: `/images/noImage.jpg`,
   scripts: {
     kitFontawsome: `/js/kit.fontawsome.min.js`,
   },

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { useFormik } from 'formik'
 
@@ -19,9 +19,12 @@ import {
   GqlMAddOrganizationVariables,
 } from '@gqlTypes/asp'
 import { BandeauLineAlert } from '@components/tail-kit/elements/alert/BandeauLineAlert'
-import { setOrganization } from '@redux/actions'
-import { addMember, addOrganization } from '@redux/slices/organization'
+import { addOrganization } from '@redux/slices/organization'
 import _ from 'lodash'
+import axios from 'axios'
+
+import 'react-responsive-carousel/lib/styles/carousel.min.css' // requires a loader
+import { Carousel } from 'react-responsive-carousel'
 
 export interface ICheckboxState {
   id: number
@@ -40,11 +43,6 @@ export const AddorgFrom = () => {
       title: OrganizationPostType.OTHER,
       checked: true,
     },
-    {
-      id: 3,
-      title: OrganizationPostType.SelfCreatedAd,
-      checked: false,
-    },
   ])
 
   const userState = useSelector((state: RootState) => state.user.user)
@@ -56,12 +54,16 @@ export const AddorgFrom = () => {
     checkboxes.filter((cb) => cb.title === OrganizationPostType.MASJID)[0]
       .checked,
   )
+  const inputFile = useRef(null)
   const check = checkboxes[0].checked
   useEffect(() => {
     const checkMajisd = checkboxes.filter(
       (cb) => cb.title === OrganizationPostType.MASJID,
     )[0].checked
     setIsMasjid(checkMajisd)
+    return () => {
+      console.log(`I Am unmounting`)
+    }
   }, [check, checkboxes])
 
   const initialFormData = {
@@ -75,6 +77,7 @@ export const AddorgFrom = () => {
     totalAmount: 0,
   }
   const [formData, setFormData] = useState(initialFormData)
+  const [images, setImages] = useState([])
   useEffect(() => {
     setFormData({
       email: userState.email,
@@ -130,11 +133,34 @@ export const AddorgFrom = () => {
             desc,
             iName,
             totalAmount,
+            images,
           },
         },
       })
     },
   })
+  const handleUploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target.files)
+    const formData = new FormData()
+    const files = e.target.files
+    for (let x = 0; x < files.length; x++) {
+      formData.append(`images`, files[x])
+    }
+    const res1 = await axios
+      .post(`http://localhost:8082/files/uploadMultipleFiles`, formData)
+      .then((res) => res.data.data)
+    const img = []
+    res1.map((data) => {
+      img.push(`http://localhost:8082/files/${data.filename}`)
+    })
+
+    setImages([...images, ...img])
+  }
+  const onButtonClick = () => {
+    // `current` points to the mounted file input element
+    inputFile.current.click()
+  }
+
   if (!userState) {
     return <div>Not ready</div>
   } else {
@@ -145,7 +171,6 @@ export const AddorgFrom = () => {
             checkboxes={checkboxes}
             setCheckboxes={setCheckboxes}
           />
-
           <div className="items-center w-full  py-2  text-gray-800 md:inline-flex md:space-y-0">
             <h2 className="max-w-sm mx-auto md:w-1/3">Account</h2>
             <div className="max-w-sm mx-auto md:w-2/3 ">
@@ -158,7 +183,6 @@ export const AddorgFrom = () => {
               />
             </div>
           </div>
-
           <hr />
           <div className="items-center w-full px-6 py-2 text-gray-800 md:inline-flex md:space-y-0 ">
             <h2 className="max-w-sm mx-auto  md:w-4/12">
@@ -223,7 +247,6 @@ export const AddorgFrom = () => {
               />
             </div>
           </div>
-
           <div className="items-center w-full p-6  text-gray-800 md:inline-flex md:space-y-0 ">
             <h2 className="max-w-sm mx-auto  md:w-4/12">{`Description`}</h2>
 
@@ -289,7 +312,6 @@ export const AddorgFrom = () => {
               </div>
             </div>
           )}
-
           <hr />
           <div className="m-3">
             {data ? (
@@ -309,16 +331,53 @@ export const AddorgFrom = () => {
               )
             )}
           </div>
-
-          <div className="w-full px-4 pb-5 ml-auto text-gray-500 md:w-1/3">
-            <Button
-              label={`Create`}
-              color="gray"
-              submit={true}
-              className="mt-5 h-10 text-center"
-              isloading={loading}
-            />
-          </div>
+          <input
+            type="file"
+            id="file"
+            ref={inputFile}
+            accept="image/*"
+            multiple={true}
+            style={{ display: `none` }}
+            onChange={handleUploadImage}
+          />
+          {images.length > 0 && (
+            <Carousel showThumbs={false}>
+              {images.map((img, index) => (
+                <div key={index}>
+                  <img className="object-contain h-80 w-full" src={img} />
+                </div>
+              ))}
+            </Carousel>
+          )}
+          {isMasjid && (
+            <div className="items-center justify-center w-full px-4 pb-5 ml-auto text-gray-500 md:w-1/3 flex flex-row gap-6">
+              <Button
+                label={`Create`}
+                color="gray"
+                submit={true}
+                className="mt-5 h-10 text-center"
+                isloading={loading}
+              />
+            </div>
+          )}
+          {!isMasjid && (
+            <div className="items-center justify-center w-full px-4 pb-5 ml-auto text-gray-500 md:w-3/5 flex flex-row gap-6">
+              <button
+                className="h-10 mt-5 flex justify-center items-center py-2 px-2  text-white w-full transition ease-in duration-200 text-center text-sm font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200"
+                onClick={onButtonClick}
+                type="button"
+              >
+                Choose Image
+              </button>
+              <Button
+                label={`Create`}
+                color="gray"
+                submit={true}
+                className="mt-5 h-10 text-center"
+                isloading={loading}
+              />
+            </div>
+          )}
         </form>
       </FormLayout>
     )

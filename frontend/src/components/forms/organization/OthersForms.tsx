@@ -10,6 +10,8 @@ import { InputText } from '@components/tail-kit/form/input-text/InputText'
 import { Button } from '@components/tail-kit/elements/buttons/Button'
 import { DOCUMENT } from '@config'
 import { Checkbox as CheckboxGroup } from '@components/tail-kit/form/toggle/Checkbox'
+import 'react-responsive-carousel/lib/styles/carousel.min.css' // requires a loader
+import { Carousel } from 'react-responsive-carousel'
 
 import { useLazyQuery, useMutation } from '@apollo/client'
 import {
@@ -86,7 +88,7 @@ export const OthersForm = () => {
       postType: OrganizationPostType.OTHER || ``,
     })
   }, [item])
-
+  const [images, setImages] = useState([])
   const [delOrganization] = useLazyQuery<
     GQLdeleteOrganization,
     GQLdeleteOrganizationVariables
@@ -149,26 +151,15 @@ export const OthersForm = () => {
       },
     })
   }
-  // const showConfirmDialog = () => {
-  //   return AddAlert.alert(
-  //     `Are your sure?`,
-  //     `Are you sure you want to remove your Ad?`,
-  //     [
-  //       // The "Yes" button
-  //       {
-  //         text: `Yes`,
-  //         onPress: () => {
-  //           handleDelete()
-  //         },
-  //       },
-  //       // The "No" button
-  //       // Does nothing but dismiss the dialog when tapped
-  //       {
-  //         text: `No`,
-  //       },
-  //     ],
-  //   )
-  // }
+  const confirmDelete = () => {
+    let txt
+    if (confirm(`Do you want yo Delete your post`)) {
+      txt = `You pressed Yes!`
+      handleDelete()
+    } else {
+      txt = `You pressed No!`
+    }
+  }
   const handleUpdate = () => {
     console.log(formData)
     updateOrg({
@@ -182,6 +173,15 @@ export const OthersForm = () => {
         },
       },
     })
+  }
+  const confirmUpdate = () => {
+    let txt
+    if (confirm(`Do you want yo update your post`)) {
+      txt = `You pressed Yes!`
+      handleUpdate()
+    } else {
+      txt = `You pressed No!`
+    }
   }
   const handleEnrollUser = () => {
     enrollUser({
@@ -304,10 +304,23 @@ export const OthersForm = () => {
           </div>
 
           <hr />
+          {item?.images.length > 0 && (
+            <Carousel showThumbs={false}>
+              {item.images.map((img, index) => (
+                <div key={index}>
+                  <img
+                    className="object-contain h-80 w-full rounded-lg"
+                    src={img}
+                  />
+                </div>
+              ))}
+            </Carousel>
+          )}
+
           <div className="m-3">
             {data ? (
               <BandeauLineAlert
-                title="Organization Created Sucessfully !"
+                title="Organization updated Successfully !"
                 borderColor="border-gray-600"
                 color="text-gray-500"
               />
@@ -324,7 +337,7 @@ export const OthersForm = () => {
 
             {isUpdated && (
               <BandeauLineAlert
-                title="Organization joined Sucessfully !"
+                title="Organization joined Successfully !"
                 borderColor="border-gray-600"
                 color="text-gray-500"
               />
@@ -339,7 +352,7 @@ export const OthersForm = () => {
                     color="gray"
                     submit={true}
                     className="  py-2 px-4 mx-5 ml-8 bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg    py-2  bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg  mt-5 h-10 md:w-1/3 text-center"
-                    onClick={handleUpdate}
+                    onClick={confirmUpdate}
                     isloading={loading}
                   />
                   <Button
@@ -347,7 +360,7 @@ export const OthersForm = () => {
                     color="gray"
                     submit={true}
                     className=" py-2 px-4  bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg    py-2  bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg  mt-5 h-10 md:w-1/3 text-center"
-                    onClick={handleDelete}
+                    onClick={confirmDelete}
                     isloading={loading}
                   />
                 </>

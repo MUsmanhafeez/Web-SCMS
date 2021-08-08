@@ -39,7 +39,7 @@ export const Button: FC<Props> = (props: Props) => {
       } text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
         props.disabled ? ` opacity-70 cursor-not-allowed` : ``
       }${!props.label ? ` w-12 h-12` : ``} ${
-        props.rounded ? `rounded-full` : `rounded-lg `
+        props.rounded ? `0000000000000000000000` : `rounded-lg `
       } ${props.className}`}
     >
       {props.isloading ? (

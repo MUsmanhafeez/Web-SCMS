@@ -10,6 +10,7 @@ import { TestModule } from './modules/test/test.module'
 import { UserModule } from './modules/user/user.module'
 import { JwtStrategy } from './modules/auth/strategies/jwt.strategy'
 import { Module } from '@nestjs/common'
+import { FilesModule } from './modules/organization/files/files.module'
 @Module({
   imports: [
     GraphQLModule.forRoot({
@@ -21,7 +22,8 @@ import { Module } from '@nestjs/common'
     TypeOrmModule.forRoot(),
     AuthModule,
     TestModule,
-    UserModule
+    UserModule,
+    FilesModule
   ],
   providers: [JwtStrategy, ...GRAPHQL_SCALARS]
 })

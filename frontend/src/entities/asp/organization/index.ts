@@ -7,6 +7,7 @@ export const GQLM_ADD_ORGANIZARION = gql`
       desc
       iName
       id
+      images
       location
       name
       ownerId
@@ -24,6 +25,7 @@ export const GQLM_ADD_ORGANIZARION = gql`
           desc
           iName
           id
+          images
           location
           name
           ownerId
@@ -51,6 +53,7 @@ export const GQLM_ADD_TOTALAMOUNT = gql`
       desc
       iName
       id
+      images
       location
       name
       ownerId
@@ -68,6 +71,7 @@ export const GQLM_ADD_TOTALAMOUNT = gql`
           desc
           iName
           id
+          images
           location
           name
           ownerId
@@ -95,6 +99,7 @@ export const GQLM_UPDATE_ORG = gql`
       desc
       iName
       id
+      images
       location
       name
       ownerId
@@ -112,6 +117,7 @@ export const GQLM_UPDATE_ORG = gql`
           desc
           iName
           id
+          images
           location
           name
           ownerId
@@ -183,6 +189,7 @@ export const GQL_All_ORGANIZATION = gql`
       desc
       iName
       id
+      images
       location
       name
       ownerId
@@ -200,6 +207,7 @@ export const GQL_All_ORGANIZATION = gql`
           desc
           iName
           id
+          images
           location
           name
           ownerId
@@ -227,6 +235,7 @@ export const GQL_MY_ORGANIZATION = gql`
       desc
       iName
       id
+      images
       location
       name
       ownerId
@@ -244,6 +253,7 @@ export const GQL_MY_ORGANIZATION = gql`
           desc
           iName
           id
+          images
           location
           name
           ownerId

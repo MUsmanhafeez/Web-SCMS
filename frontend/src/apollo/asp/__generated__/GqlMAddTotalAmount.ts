@@ -24,6 +24,7 @@ export interface GqlMAddTotalAmount_addTotalAmount_users_organizations {
   desc: string;
   iName: string | null;
   id: Uuid;
+  images: string[] | null;
   location: string;
   name: string;
   ownerId: string;
@@ -50,6 +51,7 @@ export interface GqlMAddTotalAmount_addTotalAmount {
   desc: string;
   iName: string | null;
   id: Uuid;
+  images: string[] | null;
   location: string;
   name: string;
   ownerId: string;
