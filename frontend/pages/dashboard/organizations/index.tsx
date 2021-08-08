@@ -38,15 +38,15 @@ export interface IMediaFileCard {
 
 const header = (t) => {
   return (
-    <Header title={`Dashboard`} icon={`fas fa-folder fa-2x`}>
+    <Header title={`Dashboard`} icon={`fal fa-home fa-2x`}>
       <div className="flex grid gap-2 sm:gap-4 grid-cols-5 sm:grid-cols-4 ">
         <div className="col-span-3 sm:col-span-3"></div>
         <Link href="/dashboard/organizations/addOrganization">
           <Button
             label="Add Organization"
             isFat={false}
-            color="primary"
-            className="max-w-xs self-center col-span-2 sm:col-span-1"
+            color=""
+            className="max-w-xs bg-gray-200 text-gray-700 self-center col-span-2 sm:col-span-1"
           />
         </Link>
       </div>

@@ -40,6 +40,11 @@ export const AddorgFrom = () => {
       title: OrganizationPostType.OTHER,
       checked: true,
     },
+    {
+      id: 3,
+      title: OrganizationPostType.SelfCreatedAd,
+      checked: false,
+    },
   ])
 
   const userState = useSelector((state: RootState) => state.user.user)
@@ -134,14 +139,14 @@ export const AddorgFrom = () => {
     return <div>Not ready</div>
   } else {
     return (
-      <FormLayout title={`Add Organization`} imgSrc={DOCUMENT.logo}>
+      <FormLayout title={`Add Organization`} imgSrc={DOCUMENT.logo1}>
         <form onSubmit={formik.handleSubmit}>
           <CheckboxGroup
             checkboxes={checkboxes}
             setCheckboxes={setCheckboxes}
           />
 
-          <div className="items-center w-full  py-2  text-gray-500 md:inline-flex md:space-y-0">
+          <div className="items-center w-full  py-2  text-gray-800 md:inline-flex md:space-y-0">
             <h2 className="max-w-sm mx-auto md:w-1/3">Account</h2>
             <div className="max-w-sm mx-auto md:w-2/3 ">
               <InputText
@@ -155,7 +160,7 @@ export const AddorgFrom = () => {
           </div>
 
           <hr />
-          <div className="items-center w-full px-6 py-2 text-gray-500 md:inline-flex md:space-y-0 ">
+          <div className="items-center w-full px-6 py-2 text-gray-800 md:inline-flex md:space-y-0 ">
             <h2 className="max-w-sm mx-auto  md:w-4/12">
               {!isMasjid ? `Field Name` : `Masjid Name`}
             </h2>
@@ -179,7 +184,7 @@ export const AddorgFrom = () => {
             </div>
           </div>
           {isMasjid && (
-            <div className="items-center w-full px-6 py-2 text-gray-500 md:inline-flex md:space-y-0 ">
+            <div className="items-center w-full px-6 py-2 text-gray-800 md:inline-flex md:space-y-0 ">
               <h2 className="max-w-sm mx-auto  md:w-4/12">{`Imam Name`}</h2>
 
               <div className="w-full max-w-sm pl-2 mx-auto  md:w-5/12 md:pl-9 md:inline-flex p-2">
@@ -199,7 +204,7 @@ export const AddorgFrom = () => {
               </div>
             </div>
           )}
-          <div className="items-center w-full px-6 text-gray-500 md:inline-flex md:space-y-0 ">
+          <div className="items-center w-full px-6 text-gray-800 md:inline-flex md:space-y-0 ">
             <h2 className="max-w-sm mx-auto  md:w-4/12">Phone</h2>
 
             <div className="w-full max-w-sm pl-2 mx-auto  md:w-5/12 md:pl-9 md:inline-flex p-2">
@@ -219,7 +224,7 @@ export const AddorgFrom = () => {
             </div>
           </div>
 
-          <div className="items-center w-full p-6  text-gray-500 md:inline-flex md:space-y-0 ">
+          <div className="items-center w-full p-6  text-gray-800 md:inline-flex md:space-y-0 ">
             <h2 className="max-w-sm mx-auto  md:w-4/12">{`Description`}</h2>
 
             <div className="w-full max-w-sm pl-2 mx-auto space-y-5 md:w-5/12 md:pl-9 md:inline-flex p-2">
@@ -238,7 +243,7 @@ export const AddorgFrom = () => {
               />
             </div>
           </div>
-          <div className="items-center w-full px-6  text-gray-500 md:inline-flex md:space-y-0 ">
+          <div className="items-center w-full px-6  text-gray-800 md:inline-flex md:space-y-0 ">
             <h2 className="max-w-sm mx-auto  md:w-4/12">{`Location`}</h2>
 
             <div className="w-full max-w-sm pl-2 mx-auto md:w-5/12 md:pl-9 md:inline-flex p-2">
@@ -260,7 +265,7 @@ export const AddorgFrom = () => {
             </div>
           </div>
           {isMasjid && (
-            <div className="items-center w-full px-6 py-2 text-gray-500 md:inline-flex md:space-y-0 ">
+            <div className="items-center w-full px-6 py-2 text-gray-800 md:inline-flex md:space-y-0 ">
               <h2 className="max-w-sm mx-auto  md:w-4/12">{`Add Ammount`}</h2>
 
               <div className="w-full max-w-sm pl-2 mx-auto  md:w-5/12 md:pl-9 md:inline-flex p-2">

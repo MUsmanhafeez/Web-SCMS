@@ -29,9 +29,11 @@ import {
   GqlMModifyOrganizationVariables,
   GqlMEnrollUser,
   GqlMEnrollUserVariables,
+  GqlMAddOrganization_addOrganization_users,
 } from '@gqlTypes/asp'
 import { BandeauLineAlert } from '@components/tail-kit/elements/alert/BandeauLineAlert'
 import router from 'next/router'
+import { AddAlert } from '@material-ui/icons'
 
 export interface ICheckboxState {
   id: number
@@ -53,15 +55,23 @@ export const OthersForm = () => {
   const orgState = useSelector((state: RootState) => state.organization)
   const [isOwner, setIsOwner] = useState(true)
   const [formData, setFormData] = useState(initialFormData)
-
+  const [isMember, setIsMember] = useState(false)
+  const [isUpdated, setIsUpdated] = useState(false)
   useEffect(() => {
     const activeOrg = orgState.organizations.find(
       (item) => item.id === orgState.activeOrgId,
     )
+
     setItem(activeOrg)
   }, [orgState])
 
   useEffect(() => {
+    setIsMember(
+      item?.users?.includes(
+        userState as GqlMAddOrganization_addOrganization_users,
+      ),
+    )
+    console.log(isMember)
     setIsOwner(item?.ownerId === userState?.id)
   }, [userState, item])
 
@@ -107,6 +117,8 @@ export const OthersForm = () => {
         setFormData({
           ...formData,
         })
+        setIsUpdated(true)
+        router.push(`/dashboard/organizations`)
       },
       onError: (err) => console.log(err),
     },
@@ -137,6 +149,26 @@ export const OthersForm = () => {
       },
     })
   }
+  // const showConfirmDialog = () => {
+  //   return AddAlert.alert(
+  //     `Are your sure?`,
+  //     `Are you sure you want to remove your Ad?`,
+  //     [
+  //       // The "Yes" button
+  //       {
+  //         text: `Yes`,
+  //         onPress: () => {
+  //           handleDelete()
+  //         },
+  //       },
+  //       // The "No" button
+  //       // Does nothing but dismiss the dialog when tapped
+  //       {
+  //         text: `No`,
+  //       },
+  //     ],
+  //   )
+  // }
   const handleUpdate = () => {
     console.log(formData)
     updateOrg({
@@ -289,6 +321,14 @@ export const OthersForm = () => {
                 />
               )
             )}
+
+            {isUpdated && (
+              <BandeauLineAlert
+                title="Organization joined Sucessfully !"
+                borderColor="border-gray-600"
+                color="text-gray-500"
+              />
+            )}
           </div>
           <div className="flex flex-wrap ">
             <div className="  pb-4 text-gray-500 md:w-2/3 ">
@@ -319,6 +359,7 @@ export const OthersForm = () => {
                 <Button
                   label={`Join Organization`}
                   color="gray"
+                  disabled={isMember}
                   onClick={handleEnrollUser}
                   className=" py-2 px-4 pr-5 bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg md:w-4/5 mt-5 h-10 text-center"
                   isloading={loading}

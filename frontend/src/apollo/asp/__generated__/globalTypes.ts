@@ -8,35 +8,36 @@
 //==============================================================
 
 export enum OrganizationPostType {
-  MASJID = "MASJID",
-  OTHER = "OTHER",
+  MASJID = 'MASJID',
+  OTHER = 'OTHER',
+  SelfCreatedAd = 'SelfCreatedAd',
 }
 
 export enum UserStatus {
-  ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
-  TERMINATED = "TERMINATED",
-  UNVERIFIED = "UNVERIFIED",
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  TERMINATED = 'TERMINATED',
+  UNVERIFIED = 'UNVERIFIED',
 }
 
 export interface AddOrganizationReqDto {
-  desc?: string | null;
-  iName?: string | null;
-  location: string;
-  name: string;
-  phone: string;
-  totalAmount?: number | null;
-  type: OrganizationPostType;
+  desc?: string | null
+  iName?: string | null
+  location: string
+  name: string
+  phone: string
+  totalAmount?: number | null
+  type: OrganizationPostType
 }
 
 export interface ModifyOrganizationReqDto {
-  desc?: string | null;
-  iName?: string | null;
-  name: string;
-  orgId: Uuid;
-  phone: string;
-  totalAmount?: number | null;
-  type: OrganizationPostType;
+  desc?: string | null
+  iName?: string | null
+  name: string
+  orgId: Uuid
+  phone: string
+  totalAmount?: number | null
+  type: OrganizationPostType
 }
 
 //==============================================================

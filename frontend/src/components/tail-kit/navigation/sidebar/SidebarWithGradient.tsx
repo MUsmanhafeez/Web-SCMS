@@ -15,14 +15,14 @@ export const SidebarWithGradient: React.FC<SiderbarWithGradientProps> = (
         props.hidden ? `hidden` : ``
       } md:block py-4 shadow-lg relative inset-y-0 left-0 w-64`}
     >
-      <div className="flex flex-col bg-white h-full rounded-2xl dark:bg-gray-700">
+      <div className="flex flex-col bg-gray-300 h-full rounded-2xl dark:bg-gray-700">
         <div className="flex py-6 items-center border-b-2 pb-5 pt-3 ml-3 ">
           <Avatar
             img="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6QTESaLQXNJDpokdt6XZd3CmvIevt1VKmGQ&usqp=CAU"
             size="small"
             withBorder={true}
           />
-          <span className="capitalize pl-3 flex-initial text-gray-600 text-sm md:text-base font-medium ">
+          <span className="capitalize pl-3 flex-initial text-gray-700   text-xl md:text-base font-bold ">
             {props.userInfo}
           </span>
           <br />

@@ -52,10 +52,6 @@ export class OrganizationResolver {
     @Args() addTotalRequestDto: AddTotalRequestDto,
     @userDecoder() user: User
   ): Promise<OrganizationDto> {
-    await this.orgService.checkRelationShipExist(
-      addTotalRequestDto.orgId,
-      user.id
-    )
     return await this.orgService.addTotalAmount(addTotalRequestDto, user)
   }
 
@@ -65,7 +61,6 @@ export class OrganizationResolver {
     @Args(`orgId`) orgId: Uuid,
     @userDecoder() user: User
   ): Promise<OrganizationDto> {
-    await this.orgService.checkRelationShipExist(orgId, user.id)
     return await this.orgService.enrollUser(orgId, user)
   }
 

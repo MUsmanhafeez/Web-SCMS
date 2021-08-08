@@ -39,7 +39,9 @@ export const Checkbox: FC<Props> = ({ checkboxes, setCheckboxes }) => {
                 className="flex items-center space-x-3 mb-3"
               />
             </div>
-            <span className="text-gray-400 text-sm">{checkbox.title}</span>
+            <span className="text-gray-600 font-bold text-sm">
+              {checkbox.title}
+            </span>
           </div>
         )
       })}

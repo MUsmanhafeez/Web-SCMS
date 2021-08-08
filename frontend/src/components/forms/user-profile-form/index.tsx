@@ -84,11 +84,11 @@ export const UserProfileForm: FC = () => {
     return <div>Not ready</div>
   } else {
     return (
-      <FormLayout imgSrc="images/logo/SCMS.jpeg" title={t(`form-title`)}>
+      <FormLayout imgSrc="images/logo/logo1.png" title={t(`form-title`)}>
         <form onSubmit={formik.handleSubmit}>
-          <div className="items-center w-full  p-2 space-y-2 text-gray-500 md:inline-flex md:space-y-0">
+          <div className="items-center w-full  p-2 space-y-2 text-gray-800 md:inline-flex md:space-y-0">
             <h2 className="max-w-sm mx-auto md:w-1/3">{t(`account`)}</h2>
-            <div className="max-w-sm mx-auto md:w-2/3 ">
+            <div className="max-w-sm mx-auto md:w-2/3 text-gray-800 ">
               <InputText
                 name="email"
                 type="email"
@@ -100,7 +100,7 @@ export const UserProfileForm: FC = () => {
           </div>
 
           <hr />
-          <div className="items-center w-full p-6 mb-7 space-y-4 text-gray-500 md:inline-flex md:space-y-0 ">
+          <div className="items-center w-full p-6 mb-7 space-y-4 text-gray-800 md:inline-flex md:space-y-0 ">
             <h2 className="max-w-sm mx-auto  md:w-4/12">
               {t(`personal-info`)}
             </h2>
@@ -143,7 +143,7 @@ export const UserProfileForm: FC = () => {
           </div>
 
           <hr />
-          <div className="items-center w-full p-6 mb-7 space-y-4 text-gray-500 md:inline-flex md:space-y-0">
+          <div className="items-center w-full p-6 mb-7 space-y-4 text-gray-800 md:inline-flex md:space-y-0">
             <h2 className="max-w-sm mx-auto mt-5 md:w-4/12">
               {t(`update-password`)}
             </h2>

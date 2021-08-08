@@ -9,123 +9,83 @@ import { FormLayout } from '@components/tail-kit/form/layout/FormLayout'
 import { InputText } from '@components/tail-kit/form/input-text/InputText'
 import { Button } from '@components/tail-kit/elements/buttons/Button'
 import { DOCUMENT } from '@config'
+import { Checkbox as CheckboxGroup } from '@components/tail-kit/form/toggle/Checkbox'
 
 import { useLazyQuery, useMutation } from '@apollo/client'
 import {
-  GQLM_ADD_TOTALAMOUNT,
+  GQLM_ADD_ORGANIZARION,
   GQLM_ENROLL_ORGANIZATION,
   GQLM_UPDATE_ORG,
   GQL_DELETE_ORGANIZATION,
 } from '@entities/asp/organization'
 import {
   OrganizationPostType,
+  GqlMAddOrganization,
+  GqlMAddOrganizationVariables,
   GqlMAddOrganization_addOrganization,
-  GqlMAddTotalAmount,
-  GqlMAddTotalAmountVariables,
+  GQLdeleteOrganization,
+  GQLdeleteOrganizationVariables,
   GqlMModifyOrganization,
   GqlMModifyOrganizationVariables,
   GqlMEnrollUser,
   GqlMEnrollUserVariables,
+  GqlMAddOrganization_addOrganization_users,
 } from '@gqlTypes/asp'
 import { BandeauLineAlert } from '@components/tail-kit/elements/alert/BandeauLineAlert'
-import { useRouter } from 'next/router'
-import {
-  GQLdeleteOrganization,
-  GQLdeleteOrganizationVariables,
-} from '@gqlTypes/asp/__generated__/GQLdeleteOrganization'
-import { AddAlert } from '@material-ui/icons'
+import router from 'next/router'
+
 export interface ICheckboxState {
   id: number
   title: OrganizationPostType
   checked: boolean
 }
-export const MasjidForm = () => {
+export const SelfCreatedAd = () => {
   const initialFormData = {
     orgId: ``,
     email: ``,
     name: ``,
-    iName: ``,
     desc: ``,
     location: ``,
     phone: ``,
     postType: ``,
-    totalAmount: 0,
-    addedAmount: 0,
   }
-  const router = useRouter()
+  const userState = useSelector((state: RootState) => state.user.user)
   const [item, setItem] = useState<GqlMAddOrganization_addOrganization>()
   const orgState = useSelector((state: RootState) => state.organization)
-  const userState = useSelector((state: RootState) => state.user.user)
-  const [isOwner, setIsOwner] = useState(false)
+  const [isOwner, setIsOwner] = useState(true)
   const [formData, setFormData] = useState(initialFormData)
-
+  const [isMember, setIsMember] = useState(false)
+  const [isUpdated, setIsUpdated] = useState(false)
   useEffect(() => {
     const activeOrg = orgState.organizations.find(
       (item) => item.id === orgState.activeOrgId,
     )
+
     setItem(activeOrg)
   }, [orgState])
 
   useEffect(() => {
+    setIsMember(
+      item?.users?.includes(
+        userState as GqlMAddOrganization_addOrganization_users,
+      ),
+    )
+    console.log(isMember)
     setIsOwner(item?.ownerId === userState?.id)
   }, [userState, item])
-  // const [isMasjid, setIsMasjid] = useState(
-  //   checkboxes.filter((cb) => cb.title === `Masjid`)[0].checked,
-  // )
 
   useEffect(() => {
     setFormData({
       orgId: item?.id || ``,
       email: item?.users.find((user) => user.id === item.ownerId).email || ``,
       name: item?.name || ``,
-      iName: item?.iName || ``,
       desc: item?.desc || ``,
       location: item?.location || ``,
       phone: item?.phone || ``,
-      postType: OrganizationPostType.MASJID || ``,
-      totalAmount: item?.totalAmount || 0,
-      addedAmount: 0,
+      postType: OrganizationPostType.OTHER || ``,
     })
   }, [item])
-  const [addTotalAmount] = useMutation<
-    GqlMAddTotalAmount,
-    GqlMAddTotalAmountVariables
-  >(GQLM_ADD_TOTALAMOUNT, {
-    onCompleted: (data) => {
-      setFormData({
-        ...formData,
-        totalAmount: data.addTotalAmount.totalAmount,
-        addedAmount: 0,
-      })
-    },
-    onError: (err) => console.log(err),
-  })
 
-  const [updateOrg, { data, error, loading }] = useMutation<
-    GqlMModifyOrganization,
-    GqlMModifyOrganizationVariables
-  >(GQLM_UPDATE_ORG, {
-    onCompleted: (data) => {
-      setFormData({
-        ...formData,
-        totalAmount: data.modifyOrganization.totalAmount,
-        addedAmount: 0,
-      })
-    },
-    onError: (err) => console.log(err),
-  })
-
-  const [enrollUser] = useMutation<GqlMEnrollUser, GqlMEnrollUserVariables>(
-    GQLM_ENROLL_ORGANIZATION,
-    {
-      onCompleted: (data) => {
-        setFormData({
-          ...formData,
-        })
-      },
-      onError: (err) => console.log(err),
-    },
-  )
   const [delOrganization] = useLazyQuery<
     GQLdeleteOrganization,
     GQLdeleteOrganizationVariables
@@ -134,7 +94,34 @@ export const MasjidForm = () => {
       router.push(`/dashboard/organizations`)
     },
   })
-
+  const [updateOrg, { data, error, loading }] = useMutation<
+    GqlMModifyOrganization,
+    GqlMModifyOrganizationVariables
+  >(GQLM_UPDATE_ORG, {
+    onCompleted: ({ modifyOrganization }) => {
+      setFormData({
+        ...formData,
+        desc: modifyOrganization.desc,
+        name: modifyOrganization.name,
+        orgId: modifyOrganization.id,
+        phone: modifyOrganization.phone,
+      })
+    },
+    onError: (err) => console.log(err),
+  })
+  const [enrollUser] = useMutation<GqlMEnrollUser, GqlMEnrollUserVariables>(
+    GQLM_ENROLL_ORGANIZATION,
+    {
+      onCompleted: (data) => {
+        setFormData({
+          ...formData,
+        })
+        setIsUpdated(true)
+        router.push(`/dashboard/organizations`)
+      },
+      onError: (err) => console.log(err),
+    },
+  )
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: { ...formData },
@@ -142,28 +129,18 @@ export const MasjidForm = () => {
       name: Yup.string()
         .max(100, `Max Length less than 100`)
         .required(`Required!`),
-      iname: Yup.string().max(100, `Max Length less than 100`),
       desc: Yup.string().max(1000, `Max Length less than 1000`),
       location: Yup.string()
         .max(200, `Max Length less than 200`)
         .required(`Required!`),
       phone: Yup.number().required(`Required!`),
       totalAmount: Yup.number(),
-      addedAmount: Yup.number(),
     }),
 
-    onSubmit: () => {
+    onSubmit: (e) => {
       console.log(`in submit`)
     },
   })
-  const handleAddAmount = () => {
-    addTotalAmount({
-      variables: {
-        orgId: item.id,
-        totalAmount: formData.totalAmount + formData.addedAmount,
-      },
-    })
-  }
   const handleDelete = () => {
     delOrganization({
       variables: {
@@ -171,10 +148,8 @@ export const MasjidForm = () => {
       },
     })
   }
-
   const handleUpdate = () => {
     console.log(formData)
-    console.log(formData.totalAmount + formData.addedAmount)
     updateOrg({
       variables: {
         modifyOrgReqDto: {
@@ -182,21 +157,25 @@ export const MasjidForm = () => {
           name: formData.name,
           orgId: formData.orgId,
           phone: formData.phone,
-          iName: formData.iName,
-          totalAmount: formData.addedAmount,
-          type: OrganizationPostType.MASJID,
+          type: OrganizationPostType.OTHER,
         },
       },
     })
   }
-
+  const handleEnrollUser = () => {
+    enrollUser({
+      variables: {
+        orgId: item.id,
+      },
+    })
+  }
   if (!userState) {
     return <div>Not ready</div>
   } else {
     return (
-      <FormLayout title={`Masjid Form`} imgSrc={DOCUMENT.logo1}>
+      <FormLayout title={`Add Organization`} imgSrc={DOCUMENT.logo}>
         <form onSubmit={formik.handleSubmit}>
-          <div className="items-center w-full  py-2  text-gray-300 md:inline-flex md:space-y-0">
+          <div className="items-center w-full  py-2  text-gray-500 md:inline-flex md:space-y-0">
             <h2 className="max-w-sm mx-auto md:w-1/3">Account</h2>
             <div className="max-w-sm mx-auto md:w-2/3 ">
               <InputText
@@ -210,15 +189,15 @@ export const MasjidForm = () => {
           </div>
 
           <hr />
-          <div className="items-center w-full px-6 py-2 text-gray-700 md:inline-flex md:space-y-0 ">
-            <h2 className="max-w-sm mx-auto  md:w-4/12">{`Masjid Name`}</h2>
+          <div className="items-center w-full px-6 py-2 text-gray-500 md:inline-flex md:space-y-0 ">
+            <h2 className="max-w-sm mx-auto  md:w-4/12">{`Field Name`}</h2>
 
             <div className="w-full max-w-sm pl-2 mx-auto  md:w-5/12 md:pl-9 md:inline-flex p-2">
               <InputText
                 name="name"
                 type="text"
                 disabled={!isOwner}
-                placeholder={`Enter Masjid Name`}
+                placeholder={`Enter Organization Name`}
                 value={formData.name || ``}
                 onChange={(e) => {
                   setFormData({ ...formData, name: e.target.value })
@@ -232,30 +211,6 @@ export const MasjidForm = () => {
               />
             </div>
           </div>
-
-          <div className="items-center w-full px-6 py-2 text-gray-500 md:inline-flex md:space-y-0 ">
-            <h2 className="max-w-sm mx-auto  md:w-4/12">{`Imam Name`}</h2>
-
-            <div className="w-full max-w-sm pl-2 mx-auto  md:w-5/12 md:pl-9 md:inline-flex p-2">
-              <InputText
-                name="iName"
-                type="text"
-                disabled={!isOwner}
-                placeholder={`Enter Imam Name`}
-                value={formData.iName || ``}
-                onChange={(e) => {
-                  setFormData({ ...formData, iName: e.target.value })
-                }}
-                error={
-                  formik.touched.iName &&
-                  formik.errors.iName &&
-                  formik.errors.iName
-                }
-                required={formik.touched.iName && formik.errors.iName && true}
-              />
-            </div>
-          </div>
-
           <div className="items-center w-full px-6 text-gray-500 md:inline-flex md:space-y-0 ">
             <h2 className="max-w-sm mx-auto  md:w-4/12">Phone</h2>
 
@@ -301,81 +256,12 @@ export const MasjidForm = () => {
               />
             </div>
           </div>
-          <div className="items-center w-full px-6  text-gray-500 md:inline-flex md:space-y-0 ">
-            <h2 className="max-w-sm mx-auto  md:w-4/12">{`Location`}</h2>
-
-            <div className="w-full max-w-sm pl-2 mx-auto md:w-5/12 md:pl-9 md:inline-flex p-2">
-              <InputText
-                name="location"
-                type="text"
-                disabled
-                placeholder={`Location`}
-                value={formik.values.location || ``}
-                onChange={(e) => {
-                  formik.handleChange(e)
-                  setFormData({ ...formData, location: e.target.value })
-                }}
-                error={
-                  formik.touched.location &&
-                  formik.errors.location &&
-                  formik.errors.location
-                }
-                required={
-                  formik.touched.location && formik.errors.location && true
-                }
-              />
-            </div>
-          </div>
-
-          <div className="items-center w-full px-6 py-2 text-gray-500 md:inline-flex md:space-y-0 ">
-            <h2 className="max-w-sm mx-auto  md:w-4/12">{`Total Ammount`}</h2>
-
-            <div className="w-full max-w-sm pl-2 mx-auto  md:w-5/12 md:pl-9 md:inline-flex p-2">
-              <InputText
-                name="totalAmount"
-                type="number"
-                placeholder={`0`}
-                value={formik.values.totalAmount || 0}
-                disabled
-              />
-            </div>
-          </div>
-
-          <div className="items-center w-full px-6 py-2 text-gray-500 md:inline-flex md:space-y-0 ">
-            <h2 className="max-w-sm mx-auto  md:w-4/12">{`Add Ammount`}</h2>
-
-            <div className="w-full max-w-sm pl-2 mx-auto  md:w-5/12 md:pl-9 md:inline-flex p-2">
-              <InputText
-                name="addedAmount"
-                type="number"
-                placeholder={`Enter Ammount`}
-                value={formData.addedAmount || ``}
-                onChange={(e) => {
-                  setFormData({
-                    ...formData,
-                    addedAmount: Number(e.target.value),
-                  })
-                }}
-                error={
-                  formik.touched.addedAmount &&
-                  formik.errors.addedAmount &&
-                  formik.errors.addedAmount
-                }
-                required={
-                  formik.touched.addedAmount &&
-                  formik.errors.addedAmount &&
-                  true
-                }
-              />
-            </div>
-          </div>
 
           <hr />
-
           <div className="m-3">
             {data ? (
               <BandeauLineAlert
-                title="Organization Updated Successfully !"
+                title="Organization Created Sucessfully !"
                 borderColor="border-gray-600"
                 color="text-gray-500"
               />
@@ -389,6 +275,14 @@ export const MasjidForm = () => {
                 />
               )
             )}
+
+            {isUpdated && (
+              <BandeauLineAlert
+                title="Organization joined Sucessfully !"
+                borderColor="border-gray-600"
+                color="text-gray-500"
+              />
+            )}
           </div>
           <div className="flex flex-wrap ">
             <div className="  pb-4 text-gray-500 md:w-2/3 ">
@@ -397,27 +291,31 @@ export const MasjidForm = () => {
                   <Button
                     label={`Update`}
                     color="gray"
+                    submit={true}
                     className="  py-2 px-4 mx-5 ml-8 bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg    py-2  bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg  mt-5 h-10 md:w-1/3 text-center"
-                    isloading={loading}
                     onClick={handleUpdate}
+                    isloading={loading}
                   />
                   <Button
                     label={`Delete`}
                     color="gray"
-                    className="py-2 px-4  bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg    py-2  bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg  mt-5 h-10 md:w-1/3 text-center"
+                    submit={true}
+                    className=" py-2 px-4  bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg    py-2  bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg  mt-5 h-10 md:w-1/3 text-center"
                     onClick={handleDelete}
                     isloading={loading}
                   />
                 </>
               )}
             </div>
+
             <div className="  pb-4  text-gray-500 md:w-1/3">
               {!isOwner && (
                 <Button
-                  label={`Add Ammount`}
+                  label={`Join Organization`}
                   color="gray"
-                  onClick={handleAddAmount}
-                  className=" py-2 px-4 pr-5 bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg md:w-3/4 mt-5 h-10 text-center"
+                  disabled={isMember}
+                  onClick={handleEnrollUser}
+                  className=" py-2 px-4 pr-5 bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg md:w-4/5 mt-5 h-10 text-center"
                   isloading={loading}
                 />
               )}

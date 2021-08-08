@@ -9,18 +9,18 @@ interface FormLayoutProps {
 export const FormLayout: FC<FormLayoutProps> = (props) => {
   return (
     <div>
-      <div className="p-4 bg-gray-100 border-t-2 border-indigo-400 rounded-lg bg-opacity-5">
+      <div className="p-4 bg-gray-500 border-t-2 border-indigo-500 rounded-lg ">
         <div className="max-w-sm mx-auto md:w-full md:mx-0">
           <div className="inline-flex items-center space-x-4">
             <Avatar
               size="x-small"
               img={`${props.imgSrc ? props.imgSrc : ``}`}
             />
-            <h1 className="text-gray-600">{props.title}</h1>
+            <h1 className="text-white text-xl font-bold">{props.title}</h1>
           </div>
         </div>
       </div>
-      <div className="space-y-6 bg-white">{props.children}</div>
+      <div className="space-y-6 bg-gray-200 ">{props.children}</div>
     </div>
   )
 }

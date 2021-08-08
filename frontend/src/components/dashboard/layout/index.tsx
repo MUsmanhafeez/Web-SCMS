@@ -22,7 +22,7 @@ export const DashBoardLayout = (props) => {
     <>
       <SideBarTop imgSrc={DOCUMENT.logo}>
         <Button
-          color="gray"
+          color="blue"
           icon={buttonIcon(openMenu)}
           onClick={() => setOpenMenu(!openMenu)}
         ></Button>
